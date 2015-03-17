@@ -808,7 +808,7 @@ int main(void)
     create_syscall2(40, sys_cfw_40);
 	
 	map_path_patches(1);	
-	map_path("/app_home", "/dev_usb000", 0);
+	//map_path("/app_home", "/dev_usb000", 0);
 	
     return 0;
 }
