@@ -11,6 +11,8 @@ all:
 	make -f Makefile_4.21D --no-print-directory
 	make -f Makefile_4.30 clean --no-print-directory
 	make -f Makefile_4.30 --no-print-directory
+	make -f Makefile_4.30D clean --no-print-directory
+	make -f Makefile_4.30D --no-print-directory
 	make -f Makefile_4.31 clean --no-print-directory
 	make -f Makefile_4.31 --no-print-directory
 	make -f Makefile_4.40 clean --no-print-directory

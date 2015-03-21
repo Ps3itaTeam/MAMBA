@@ -704,10 +704,10 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	return ENOSYS;
 }
 
-LV2_SYSCALL2(int, sys_cfw_40, (uint64_t r3, uint64_t r4))
+/* LV2_SYSCALL2(int, sys_cfw_40, (uint64_t r3, uint64_t r4))
 {
 	return ENOSYS;
-}
+} */
 
 
 #if 0
@@ -772,7 +772,6 @@ static INLINE void apply_kernel_patches(void)
 		clear_icache(addr, 4);
 	}
     */
-
 	create_syscall2(9, sys_cfw_lv1_poke);
 	create_syscall2(10, sys_cfw_lv1_call);
 	create_syscall2(11, sys_cfw_lv1_peek);
@@ -805,7 +804,11 @@ int main(void)
     create_syscall2(8, syscall8);
 	create_syscall2(6, sys_cfw_peek);
     create_syscall2(7, sys_cfw_poke);
-    create_syscall2(40, sys_cfw_40);
+	
+	//create_syscall2(40, sys_cfw_40);
+    uint64_t syscall_not_impl = *(uint64_t *)MKA(syscall_table_symbol);//NzV
+	*(uint64_t *)MKA(syscall_table_symbol+ ( 8* 40)) = syscall_not_impl;//NzV
+	
 	
 	map_path_patches(1);	
 	//map_path("/app_home", "/dev_usb000", 0);
