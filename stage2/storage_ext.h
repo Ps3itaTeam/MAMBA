@@ -5,6 +5,7 @@
 #include <lv2/synchronization.h>
 #include "scsi.h"
 
+
 enum EMU_TYPE
 {
 	EMU_OFF = 0,
@@ -25,6 +26,8 @@ enum STORAGE_COMMAND
 	CMD_FAKE_STORAGE_EVENT,
 	CMD_GET_PSX_VIDEO_MODE
 };
+
+extern uint8_t storage_ext_patches_done;
 
 void storage_ext_init(void);
 void storage_ext_patches(void);

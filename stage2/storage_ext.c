@@ -16,16 +16,15 @@
 #include <lv1/lv1call.h>
 #include <lv1/stor.h>
 #include <lv1/patch.h>
-//#include "common.h"
+
+#include "common.h"
 #include "storage_ext.h"
 #include "scsi.h"
-//#include "cobra.h"
 #include "config.h"
 #include "crypto.h"
 #include "mappath.h"
 #include "modulespatch.h"
 
-//uint8_t condition_ps2softemu = 0;
 
 #define READ_BUF_SIZE			(256*1024)
 #define READ_BUF_SIZE_SECTORS_PSX	(128)
@@ -136,8 +135,6 @@ static DiscFileProxy *discfile_proxy;
 static int disc_being_mounted = 0;
 static int could_not_read_disc;
 static int hdd0_mounted = 0;
-
-static int ps2emu_type;
 
 static int video_mode = -2;
 
@@ -2111,13 +2108,6 @@ static INLINE void do_video_mode_patch(void)
 			patch = LWZ(R0, 0x74, SP);
 			video_mode = -2;
 		}
-
-		if (patch != 0)
-		{
-			//DPRINTF("Doing patch %08X\n", patch);
-            if(vmode_patch_offset) // prevent undefined vmode_patch_offset
-			copy_to_user(&patch, (void *)(vmode_patch_offset+0x10000), 4);
-		}
 	}
 }
 
@@ -2402,7 +2392,7 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 	if (!hdd0_mounted && strcmp(mount_point, "/dev_hdd0") == 0 && strcmp(filesystem, "CELL_FS_UFS") == 0)
 	{
 		hdd0_mounted = 1;
-		read_cobra_config();
+		read_mamba_config();
 		//do_spoof_patches();
 		//load_boot_plugins();
 
@@ -2421,243 +2411,6 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 			}
 		}
 		mutex_unlock(mutex);
-	}
-
-	return 0;
-}
-
-static INLINE int get_ps2emu_type(void)
-{
-	uint8_t config[8];
-	u64 v2;
-
-	lv1_get_repository_node_value(PS3_LPAR_ID_PME, FIELD_FIRST("sys", 0), FIELD("hw", 0), FIELD("config", 0), 0, (u64 *)config, &v2);
-	if (config[6]&1) // has emotion engine
-	{
-		return PS2EMU_HW;
-	}
-	else if (config[0]&0x20) // has graphics synthesizer
-	{
-		return PS2EMU_GX;
-	}
-
-	return PS2EMU_SW;
-}
-
-#ifdef PS2EMU_DEBUG
-
-static INLINE void load_ps2emu_stage2(int emu_type)
-{
-	char name[64];
-	int src, dst;
-	uint8_t *buf;
-	int i;
-
-	if (emu_type < 0 || emu_type > PS2EMU_GX)
-		return;
-
-	// Transfer ps2emu stage2 from usb to hdd for debug purposes
-
-	page_allocate_auto(NULL, 0x10000, 0x2F, (void **)&buf);
-
-	for (i = 0; i < 10; i++)
-	{
-		sprintf(name, "/dev_usb00%d/s2.bin", i);
-
-		if (cellFsOpen(name, CELL_FS_O_RDONLY, &src, 0, NULL, 0) == 0)
-		{
-			uint64_t size;
-
-			cellFsRead(src, buf, 0x10000, &size);
-			cellFsClose(src);
-
-			if (cellFsOpen(PS2EMU_STAGE2_FILE, CELL_FS_O_WRONLY|CELL_FS_O_CREAT|CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
-			{
-				cellFsWrite(dst, buf, size, &size);
-				cellFsClose(dst);
-			}
-
-			break;
-		}
-	}
-
-	if (i == 10)
-	{
-		//DPRINTF("Failed to open debug ps2 stage2.\n");
-	}
-
-	page_free(NULL, buf, 0x2F);
-}
-
-#else
-
-char *ps2emu_stage2[] =
-{
-	"ps2hwemu_stage2.bin",
-	"ps2gxemu_stage2.bin",
-};
-
-static INLINE void load_ps2emu_stage2(int emu_type)
-{
-	char name[64];
-	int src, dst;
-	uint8_t *buf;
-
-	if (emu_type < 0 || emu_type > PS2EMU_GX)
-		return;
-
-	page_allocate_auto(NULL, 0x10000, 0x2F, (void **)&buf);
-
-	sprintf(name, "/dev_flash/ps2emu/%s", ps2emu_stage2[emu_type]);
-
-	if (cellFsOpen(name, CELL_FS_O_RDONLY, &src, 0, NULL, 0) == 0)
-	{
-		uint64_t size;
-
-		cellFsRead(src, buf, 0x10000, &size);
-		cellFsClose(src);
-
-		if (cellFsOpen(PS2EMU_STAGE2_FILE, CELL_FS_O_WRONLY|CELL_FS_O_CREAT|CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
-		{
-			cellFsWrite(dst, buf, size, &size);
-			cellFsClose(dst);
-		}
-	}
-	else
-	{
-		//DPRINTF("Failed to open ps2 stage2: %s\n", name);
-	}
-
-	page_free(NULL, buf, 0x2F);
-}
-
-#endif /*  PS2EMU_DEBUG */
-
-static void build_netemu_params(uint8_t *ps2_soft, uint8_t *ps2_net)
-{
-	int fd;
-	uint64_t written;
-
-	// First take care of sm arguments
-	memset(ps2_net, 0, 0x40);
-	memcpy(ps2_net, ps2_soft, 8);
-	ps2_net[8] = 3;
-	strcpy((char *)ps2_net + 9, "--COBRA--");
-	memcpy(ps2_net+0x2A, ps2_soft+0x118, 6);
-
-	// Now ps2bootparam
-	if (cellFsOpen("/dev_hdd0/tmp/game/ps2bootparam.dat", CELL_FS_O_WRONLY|CELL_FS_O_CREAT|CELL_FS_O_TRUNC, &fd, 0666, NULL, 0) != 0)
-	{
-		//DPRINTF("Cannot open ps2bootparam.dat\n");
-		return;
-	}
-
-	// netemu ps2bootparam.dat has a format very similar to softemu sm arguments
-	ps2_soft[11] = 3;
-	strcpy((char *)ps2_soft+12, "--COBRA--");
-
-	cellFsWrite(fd, ps2_soft, 0x4F0, &written);
-
-	// netemu has a 0x4F0-0x773 section where custom memory card is, but we dont need it,
-	// Not writing it + a patch in netemu forces the emu to use the internal ones like BC consoles
-	// NPDRM games will still use their memcards as the section is written
-	cellFsClose(fd);
-}
-
-LV2_HOOKED_FUNCTION(int, shutdown_copy_params_patched, (uint8_t *argp_user, uint8_t *argp, uint64_t args, uint64_t param))
-{
-	int prepare_ps2emu = 0;
-
-	copy_from_user(argp_user, argp, args);
-	extend_kstack(0);
-
-	if (param == 0x8202) /* Reboot into PS2 LPAR (ps2_emu, ps2_gxemu or ps2_softemu) */
-	{
-		prepare_ps2emu = 1;
-	}
-	else if (param == 0x8204) /* Reboot into ps2_netemu LPAR */
-	{
-		// We need to check first if this a NPDRM or a plain iso launched from disc icon
-		// Discard first the case of BC consoles, since the ps2tonet patch is not done there
-		if (ps2emu_type == PS2EMU_SW)
-		{
-			if (argp[12] == 0) /* if vsh prepared the arguments for ps2_softemu */
-			{
-				if (disc_emulation == EMU_OFF)
-				{
-					// If optical disc, let's just panic
-					if (effective_disctype == DEVICE_TYPE_PS2_CD || effective_disctype == DEVICE_TYPE_PS2_DVD)
-					{
-						//fatal("Sorry, no optical disc support in ps2_netemu\n");
-					}
-					else
-					{
-						// We should be never here "naturally" (a hb could still force this situation)
-						// Well, maybe if the user quckly removed a ps2 disc...
-					}
-				}
-				else if (disc_emulation == EMU_PS2_CD || disc_emulation == EMU_PS2_DVD)
-				{
-					prepare_ps2emu = 1;
-					build_netemu_params(get_secure_user_ptr(argp_user), argp);
-				}
-				else
-				{
-					// We should be never here "naturally" (a hb could still force this situation)
-				}
-			}
-			else
-			{
-				//DPRINTF("NPDRM game, skipping ps2emu preparation\n");
-			}
-		}
-	}
-
-	if (prepare_ps2emu)
-	{
-		int fd;
-
-		if (cellFsOpen(PS2EMU_CONFIG_FILE, CELL_FS_O_WRONLY|CELL_FS_O_CREAT|CELL_FS_O_TRUNC, &fd, 0666, NULL, 0) == 0)
-		{
-			if (disc_emulation == EMU_PS2_DVD || disc_emulation == EMU_PS2_CD)
-			{
-				uint64_t nwritten;
-				uint8_t *buf;
-
-				page_allocate_auto(NULL, 0x1000, 0x2F, (void **)&buf);
-
-				memset(buf, 0, 0x1000);
-				// bit 0-> is cd
-				// bit 1 -> total emulation
-				buf[0] = (disc_emulation == EMU_PS2_CD) | ((real_disctype == 0)<<1);
-				strncpy((char *)buf+1, (discfile_cd) ? discfile_cd->file : discfile->files[0], 0x7FE);
-
-				// TODO: this will need change when adding proxy to PS2
-				if (discfile_cd)
-				{
-					buf[0x800] = discfile_cd->numtracks;
-					memcpy(buf+0x801, discfile_cd->tracks, discfile_cd->numtracks*sizeof(ScsiTrackDescriptor));
-				}
-
-
-				cellFsWrite(fd, buf, 0x1000, &nwritten);
-				cellFsClose(fd);
-
-				page_free(NULL, buf, 0x2F);
-			}
-			else
-			{
-				cellFsClose(fd);
-
-				// Delete file only on original disc, otherwise the file will be empty
-				if (real_disctype == DEVICE_TYPE_PS2_DVD || real_disctype == DEVICE_TYPE_PS2_CD)
-				{
-					cellFsUnlink(PS2EMU_CONFIG_FILE);
-				}
-			}
-		}
-
-		load_ps2emu_stage2(ps2emu_type);
 	}
 
 	return 0;
@@ -3432,51 +3185,10 @@ int sys_storage_ext_mount_encrypted_image(char *image, char *mount_point, char *
 }
 
 
-
-static INLINE void patch_ps2emu_entry(int ps2emu_type)
-{
-	int patch_count = 0;
-
-
-	if (ps2emu_type == PS2EMU_SW)
-	{
-		condition_ps2softemu = 1;
-
-		// No need to do the optical disc auth patch for ps2_netemu since there is no optical disc support
-		return;
-	}
-
-	// Patch needed to support PS2 CD-R(W) and DVD+-R(W). Not necessary for isos.
-	// Needed but not enough: patches at ps2 emus are necessary too!
-	// Patch address may be different in different models
-	for (u64 search_addr = 0x100000; search_addr < 0x300000; search_addr += 4)
-	{
-		if (lv1_peekd(search_addr) == 0x409E00702FBE0001)
-		{
-			//DPRINTF("PS2 auth patch at HV:%lx\n", search_addr+0x10);
-			lv1_pokew(search_addr+0x10, LI(R3, 0x29));
-
-			patch_count++;
-		}
-
-		else if (lv1_peekd(search_addr) == 0x38800002409C0014)
-		{
-			//DPRINTF("PS2 unauth patch at HV:%lx\n", search_addr+0x10);
-			lv1_pokew(search_addr+0x10, LI(R3, 0x29));
-
-			patch_count++;
-		}
-
-		if (patch_count == 2)
-			break;
-	}
-}
-
 void storage_ext_init(void)
 {
 	thread_t dispatch_thread;
 
-	ps2emu_type = get_ps2emu_type();
 	mutex_create(&mutex, SYNC_PRIORITY, SYNC_NOT_RECURSIVE);
 	event_port_create(&command_port, EVENT_PORT_LOCAL);
 	event_port_create(&result_port, EVENT_PORT_LOCAL);
@@ -3487,9 +3199,12 @@ void storage_ext_init(void)
 	ppu_thread_create(&dispatch_thread, dispatch_thread_entry, 0, -0x1D8, 0x4000, 0, THREAD_NAME);
 }
 
+uint8_t storage_ext_patches_done;
+
 void storage_ext_patches(void)
 {
-	//patch_ps2emu_entry(ps2emu_type);
+	if (storage_ext_patches_done == 1) return;
+	storage_ext_patches_done = 1;
 	patch_jump(device_event_port_send_call, device_event);
 	hook_function_on_precall_success(storage_get_device_info_symbol, post_storage_get_device_info, 2);
 	// read_bdvd0 is the base function called by read_bdvd1 and read_bdvd2.
@@ -3505,8 +3220,6 @@ void storage_ext_patches(void)
 	hook_function_with_cond_postcall(get_syscall_address(SYS_STORAGE_ASYNC_SEND_DEVICE_COMMAND), emu_sys_storage_async_send_device_command, 7);
 	// SS function
 	hook_function_with_cond_postcall(get_syscall_address(864), emu_disc_auth, 2);
-	// For PS2
-	//patch_call(shutdown_copy_params_call, shutdown_copy_params_patched);
 	// For initial setup and for psx vmode check
 	hook_function_on_precall_success(cellFsUtilMount_symbol, post_cellFsUtilMount, 8);
 	// For encrypted fsloop images
@@ -3516,8 +3229,7 @@ void storage_ext_patches(void)
 
 }
 
-///////////// PS3MAPI BEGIN //////////////
-
+#ifdef PS3M_API
 void unhook_all_storage_ext(void)
 {
 	suspend_intr();
@@ -3532,5 +3244,4 @@ void unhook_all_storage_ext(void)
 	unhook_function_with_cond_postcall(get_syscall_address(864), emu_disc_auth, 2);
 	resume_intr();
 }
-
-///////////// PS3MAPI END //////////////
+#endif

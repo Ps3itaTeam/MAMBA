@@ -7,30 +7,129 @@
 
 // BIG WARNING: self offsets need to add 0x10000 for address shown in IDA, but not sprxs!
 
+#if defined(FIRMWARE_3_55)
 
-#define vmode_patch_offset		0x0 // undefined
-#define vsh_text_size			0x0 // undefined
-#define revision_offset			0x0
-#define revision_offset2		0x0 /* In data section */
-#define spoof_version_patch		0x0
+#define LIBFS_EXTERNAL_HASH			0x5bc7bad800005fa4
+#define aio_copy_root_offset		0xD37C
+
+#elif defined(FIRMWARE_3_55DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bad800005fa4
+#define aio_copy_root_offset		0xD37C
+
+#elif defined(FIRMWARE_4_21)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_21DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_30)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_30DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_31)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_40)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_41)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_41DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_46)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006433
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_46DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bec800006433
+#define aio_copy_root_offset		0xD5B4
+
+#elif defined(FIRMWARE_4_50)
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_50DEX)
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_53)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_53DEX)
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_55)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_55DEX)
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_60)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_65)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477 
+#define aio_copy_root_offset		0xD658
+ 
+#elif defined(FIRMWARE_4_65DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_66)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477 
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_66DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_70)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#endif /* FIRMWARE */
 
 
-typedef struct
-{
-	uint32_t offset;
-	uint32_t data;
-	uint8_t *condition;
-} SprxPatch;
-
-extern uint8_t condition_ps2softemu;
-extern uint8_t condition_apphome;
-extern uint8_t condition_psp_iso;
-extern uint8_t condition_psp_dec;
-extern uint8_t condition_psp_keys;
-extern uint8_t condition_psp_change_emu;
-extern uint8_t condition_psp_prometheus;
 
 extern uint8_t block_peek;
+
+extern uint8_t condition_apphome;
 
 extern process_t vsh_process;
 
@@ -40,21 +139,13 @@ process_t get_vsh_process(void);
 
 ///////////// NzV END //////////////
 
-extern uint8_t safe_mode;
 
 /* Functions for kernel */
 void modules_patch_init(void);
-#if 0
-void do_spoof_patches(void);
-void load_boot_plugins(void);
-#endif
 int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_size);
 int prx_unload_vsh_plugin(unsigned int slot);
 
 /* Syscalls */
-#if 0
-int sys_vsh_spoof_version(char *version_str);
-#endif
 int sys_prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_size);
 int sys_prx_unload_vsh_plugin(unsigned int slot);
 int sys_thread_create_ex(sys_ppu_thread_t *thread, void *entry, uint64_t arg, int prio, uint64_t stacksize, uint64_t flags, const char *threadname);
