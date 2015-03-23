@@ -125,23 +125,17 @@
 
 #endif /* FIRMWARE */
 
-
-
-extern uint8_t block_peek;
-
-extern uint8_t condition_apphome;
+extern uint8_t condition_apphome; //needed libfs patch (JB FORMAT GAME)
 
 extern process_t vsh_process;
 
-///////////// NzV BEGIN //////////////
-
-process_t get_vsh_process(void);
-
-///////////// NzV END //////////////
-
+process_t get_vsh_process(void); //NzV
 
 /* Functions for kernel */
 void modules_patch_init(void);
+#ifdef PS3M_API
+void unhook_all_modules(void);
+#endif
 int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_size);
 int prx_unload_vsh_plugin(unsigned int slot);
 
@@ -150,12 +144,10 @@ int sys_prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t a
 int sys_prx_unload_vsh_plugin(unsigned int slot);
 int sys_thread_create_ex(sys_ppu_thread_t *thread, void *entry, uint64_t arg, int prio, uint64_t stacksize, uint64_t flags, const char *threadname);
 
-///////////// PS3MAPI END //////////////
-
-void unhook_all_modules(void);
+#ifdef PS3M_API
 int ps3mapi_unload_vsh_plugin(char* name);
 int ps3mapi_get_vsh_plugin_info(unsigned int slot, char *name, char *filename);
-///////////// PS3MAPI END //////////////
+#endif
 
 #endif /* __MODULESPATCH_H__ */
 

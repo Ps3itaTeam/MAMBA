@@ -98,7 +98,7 @@
 //----------------------------------------
 
 #define MAMBA_VERSION		0x0F
-#define MAMBA_VERSION_BCD	0x0700
+#define MAMBA_VERSION_BCD	0x0800
 
 // Format of version:
 // byte 0, 7 MS bits -> reserved
@@ -181,17 +181,7 @@ LV2_SYSCALL2(uint64_t, sys_cfw_peek, (uint64_t *addr))
 	#ifdef DEBUG
 	DPRINTF("peek %p\n", addr);
 	#endif
-		
-	if (block_peek)
-	{	
-		#ifdef DEBUG
-		DPRINTF("peek blocked\n");
-		#endif
-		
-		return (uint64_t)ENOSYS;
-	}
 
-		
 	uint64_t ret = *addr;
 		
 	// Fix compatibilty issue with prx loader (before v1.08 [U]). It searches for a string... that is also in this payload, and then lv2_peek((vsh_str + 0x70)) crashes the system.
@@ -255,8 +245,10 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 	{
 		uint64_t syscall_num = (addr-MKA(syscall_table_symbol)) / 8;
 		
-		if ((syscall_num >= 6 && syscall_num <= 10) || syscall_num == 35)
+		if ((syscall_num >= 6 && syscall_num <= 10) || syscall_num == 35)//Rewrite protection
 		{
+			uint64_t sc_null = *(uint64_t *)MKA(syscall_table_symbol);
+			uint64_t syscall_not_impl = *(uint64_t *)sc_null;
 			if (syscall_num == 8 && (value & 0xFFFFFFFF00000000ULL) == MKA(0))
 			{
 				// Probably iris manager or similar
@@ -264,10 +256,6 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 				// First check if it is trying to restore our syscall8
 				if (*(uint64_t *)syscall8 == value)
 				{
-					#ifdef ENABLE_LOG
-					WriteToLog("Removing syscall 8 extension\n");
-					#endif
-				
 					#ifdef DEBUG
 					DPRINTF("Removing syscall 8 extension\n");
 					#endif
@@ -278,11 +266,6 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 				
 				extended_syscall8.addr = (void *) *(uint64_t *)value;
 				extended_syscall8.toc = (void *) *(uint64_t *)(value+8);
-		
-				#ifdef ENABLE_LOG
-				sprintf(buffer_log, "Adding syscall 8 extension %p %p\n", extended_syscall8.addr, extended_syscall8.toc);
-				WriteToLog(buffer_log);
-				#endif
 			
 				#ifdef DEBUG
 				DPRINTF("Adding syscall 8 extension %p %p\n", extended_syscall8.addr, extended_syscall8.toc);
@@ -290,17 +273,19 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 				
 				return;
 			}
-			
-			#ifdef ENABLE_LOG
-			sprintf(buffer_log, "HB has been blocked from rewritting syscall %ld\n", syscall_num);
-			WriteToLog(buffer_log);
-			#endif
-		
-			#ifdef DEBUG
-			DPRINTF("HB has been blocked from rewritting syscall %ld\n", syscall_num);
-			#endif
-			
-			return;
+			else if (((value == sc_null) ||(value == syscall_not_impl)) && (syscall_num != 8)) //Allow remove protected syscall 6 7 9 10 11 35 NOT 8
+			{
+				#ifdef DEBUG
+				DPRINTF("HB remove syscall %ld\n", syscall_num);
+				#endif
+			}
+			else
+			{
+				#ifdef DEBUG
+				DPRINTF("HB has been blocked from rewritting syscall %ld\n", syscall_num);
+				#endif
+				return;
+			}
 		}		
 	}
 	else if (addr == MKA(open_path_symbol))

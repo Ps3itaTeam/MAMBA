@@ -377,7 +377,6 @@ process_t get_vsh_process(void) //NzV
 	return NULL;
 }
 
-uint8_t block_peek;//mmCM
 
 LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, load_process_hooked, (process_t process, int fd, char *path, int r6, uint64_t r7, uint64_t r8, uint64_t r9, uint64_t r10, uint64_t sp_70))
 {
@@ -385,43 +384,25 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, load_process_hooked, (process_t proce
 	#ifdef DEBUG
 	DPRINTF("PROCESS %s (%08X) loaded\n", path, process->pid);
 	#endif
-	//VSH process
-	if ((!vsh_process) && (storage_ext_patches_done == 0))
+	//Get VSH process
+	if (!vsh_process)
 	{
-        if(is_vsh_process(process->parent)) {
-            vsh_process = process->parent;
-			if (storage_ext_patches_done == 0) 
-			{
-				storage_ext_patches_done = 1;
-				storage_ext_patches();
-			}
-        }
-        else if (strcmp(path, "/dev_flash/vsh/module/vsh.self") == 0)
-		{
-			vsh_process = process;
-			if (storage_ext_patches_done == 0) 
-			{
-				storage_ext_patches_done = 1;
-				storage_ext_patches();
-			}
-		}
-	}
-	//mmCM
-	if (strcmp(path, "/dev_hdd0/game/BLES80608/USRDIR/EBOOT.BIN") == 0)
-	{
-		#ifdef DEBUG
-		DPRINTF("Block peek in multiman");
+        if(is_vsh_process(process->parent)) vsh_process = process->parent;
+        else if (is_vsh_process(process)) vsh_process = process;
+		else vsh_process = get_vsh_process();
+		#ifndef DEBUG
+		if (vsh_process) unhook_function_on_precall_success(load_process_symbol, load_process_hooked, 9);
 		#endif
-		// Block peek in multiman so that it detects it is cobra and enters mmcm mode;
-		// Allow it to run in normal mode if key combination is pressed
-		// pad_data data;
 		
-		/* if (pad_get_data(&data) >= ((PAD_BTN_OFFSET_DIGITAL+1)*2)) block_peek = ((data.button[PAD_BTN_OFFSET_DIGITAL] & (PAD_CTRL_CROSS|PAD_CTRL_L2)) != (PAD_CTRL_CROSS|PAD_CTRL_L2));			
-		else block_peek = 1; */
-		
-		block_peek = 1;
-	}
-	else block_peek = 0;
+		if ((vsh_process) && (storage_ext_patches_done == 0))
+		{
+			storage_ext_patches_done = 1;
+			storage_ext_patches();
+		}
+	}	
+	#ifndef DEBUG
+	else unhook_function_on_precall_success(load_process_symbol, load_process_hooked, 9);
+	#endif
 	
 	return 0;
 }
@@ -621,9 +602,9 @@ int ps3mapi_unload_vsh_plugin(char *name)
 
 int ps3mapi_get_vsh_plugin_info(unsigned int slot, char *name, char *filename)
 {
-	if (vsh_plugins[slot] == 0) return ESRCH;
 	if (!vsh_process) vsh_process = get_vsh_process();
     if (vsh_process <= 0) return ESRCH;
+	if (vsh_plugins[slot] == 0) return ENOENT;
 	char *tmp_filename = alloc(256, 0x35);
 	if (!tmp_filename) return ENOMEM;
 	sys_prx_segment_info_t *segments = alloc(sizeof(sys_prx_segment_info_t), 0x35);
@@ -653,9 +634,6 @@ int ps3mapi_get_vsh_plugin_info(unsigned int slot, char *name, char *filename)
 //INIT
 //----------------------------------------
 
-#ifdef PS3M_API
-
-
 void modules_patch_init(void)
 {
     int n;
@@ -664,13 +642,20 @@ void modules_patch_init(void)
 	hook_function_with_precall(lv1_call_99_wrapper_symbol, post_lv1_call_99_wrapper, 2);
 	patch_call(patch_func2 + patch_func2_offset, modules_patching);	
 	hook_function_with_cond_postcall(modules_verification_symbol, pre_modules_verification, 2);
-	hook_function_with_postcall(map_process_memory_symbol, pre_map_process_memory, 7);	
+	#ifdef PS3M_API
+	hook_function_with_postcall(map_process_memory_symbol, pre_map_process_memory, 7);
+	#endif
+	if (!vsh_process) vsh_process = get_vsh_process(); //NzV
+	#ifndef DEBUG
+	if (!vsh_process) hook_function_on_precall_success(load_process_symbol, load_process_hooked, 9);
+	#else	
 	hook_function_on_precall_success(load_process_symbol, load_process_hooked, 9);	
-#ifdef DEBUG
 	hook_function_on_precall_success(create_process_common_symbol, create_process_common_hooked, 16);
 	//hook_function_with_postcall(create_process_common_symbol, create_process_common_hooked_pre, 8);
-#endif
+	#endif
 }
+
+#ifdef PS3M_API
 
 void unhook_all_modules(void)
 {
@@ -678,8 +663,8 @@ void unhook_all_modules(void)
 	unhook_function_with_precall(lv1_call_99_wrapper_symbol, post_lv1_call_99_wrapper, 2);
 	unhook_function_with_cond_postcall(modules_verification_symbol, pre_modules_verification, 2);
 	unhook_function_with_postcall(map_process_memory_symbol, pre_map_process_memory, 7);	
-	unhook_function_on_precall_success(load_process_symbol, load_process_hooked, 9);	
 	#ifdef DEBUG
+	unhook_function_on_precall_success(load_process_symbol, load_process_hooked, 9); //unhook it-self if not set to debug
 	unhook_function_on_precall_success(create_process_common_symbol, create_process_common_hooked, 16);
 	//unhook_function_with_postcall(create_process_common_symbol, create_process_common_hooked_pre, 8);
 	#endif
