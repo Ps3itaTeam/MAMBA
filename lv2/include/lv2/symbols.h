@@ -23,6 +23,8 @@
 #define memcpy_symbol                               0x7C3A4
 #define memset_symbol                               0x4E4D8
 #define memcmp_symbol                               0x4D7E8
+#define printf_symbol					0x29285C
+#define printfnull_symbol				0x2972CC
 #define sprintf_symbol                              0x4F900
 #define snprintf_symbol                             0x4F86C
 #define strcpy_symbol                               0x4E684
@@ -105,8 +107,8 @@
 #define process_rtoc_entry_1                        -0x77C0
 #define patch_func2                                 0x7A7C4
 #define patch_func2_offset                          0x2C
-#define user_thread_prio_patch						0x20140
-#define user_thread_prio_patch2						0x2014C
+#define user_thread_prio_patch				0x20140
+#define user_thread_prio_patch2				0x2014C
 #elif defined(FIRMWARE_3_55DEX) // Ported by Joonie, Big thanks to @aldostools for his amazing tool, special thanks to @Estwald
 #define TOC                                         0x34AC80 //done
 #define open_shared_kernel_object_symbol            0x1288C // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -126,6 +128,10 @@
 #define memcpy_symbol                               0x8039C // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x51D9C // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x510AC // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x29A890 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x29F314 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
+#define sprintf_symbol					0x531C4 // bytes matched: 0x14  F821FF817C0802A6F8A100C0F8010090380100C0
+#define snprintf_symbol					0x53130 // bytes matched: 0x20  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define sprintf_symbol                              0x531C4 // bytes matched: 0x14  F821FF817C0802A6F8A100C0F8010090380100C0
 #define snprintf_symbol                             0x53130 // bytes matched: 0x20  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x51F48 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -209,6 +215,8 @@
 #define process_rtoc_entry_1				-0x7760 //found at 0x1B4FF 88A03FC0800163DE0005E87D0000
 #define patch_func2                                 0x7E7BC // F821FF61 7C0802A6FBC10090 7C9E2378E8
 #define patch_func2_offset                          0x2C //UNTOUCHED
+#define user_thread_prio_patch						0x21B0C // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2						0x21B18	// bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_21) //Ported by Joonie, Big thanks to @aldostools for his amazing tool and special thanks to Estwald who is the original creater of this mamba
 #define TOC                                         0x346390 //done
 #define open_shared_kernel_object_symbol            0x123FC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -228,6 +236,8 @@
 #define memcpy_symbol                               0x7DFD0 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x4E508 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x4D818 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x29E77C // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x2A31EC // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x4F930 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A295B0F8C100C8F8610078
 #define snprintf_symbol                             0x4F89C // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x4E6B4 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -332,6 +342,8 @@
 #define memcpy_symbol                               0x81FF4 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x51DF8 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x51108 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x2A6828 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x2AB2AC // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x53220 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A29690F8C100C8F8610078
 #define snprintf_symbol                             0x5318C // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x51FA4 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -436,6 +448,8 @@
 #define memcpy_symbol					0x7E0FC
 #define memset_symbol					0x4E544
 #define memcmp_symbol					0x4D854
+#define printf_symbol					0x29FEEC
+#define printfnull_symbol				0x2A495C
 #define sprintf_symbol					0x4F96C
 #define snprintf_symbol					0x4F8D8
 #define strcpy_symbol					0x4E6F0
@@ -540,6 +554,8 @@
 #define memcpy_symbol                               0x82120 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x51E34 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x51144 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x2A7F50 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x2AC9D4 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x5325C // bytes matched: 0x14  F821FF817C0802A6F8A100C0F8010090380100C0
 #define snprintf_symbol                             0x531C8 // bytes matched: 0x20  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x51FE0 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -623,6 +639,8 @@
 #define process_rtoc_entry_1				-0x77A0 //found at 0x1B903 88603FC0800163DE0005E87D0000
 #define patch_func2                                 0x5DBA8 // bytes matched: 0x10  F821FF617C0802A6FBC100907C9E2378
 #define patch_func2_offset                          0x2C // bytes matched: 0x80  0000000000000000000000000000000000000000000000000000000000000000
+#define user_thread_prio_patch				0x21BA8 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2				0x21BB4 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_31) //Ported by Joonie, Big thanks to aldostools for his awesome getsymbol tool :)
 #define TOC                                         0x348210 //done
 #define open_shared_kernel_object_symbol            0x123FC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -642,6 +660,8 @@
 #define memcpy_symbol                               0x7E100 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x4E548 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x4D858 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol                                   0x29FEF8 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol                               0x2A4968 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x4F970 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A295B0F8C100C8F8610078
 #define snprintf_symbol                             0x4F8DC // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x4E6F4 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -725,6 +745,8 @@
 #define process_rtoc_entry_1                        -0x7800 //found at 0x19F0F 88003FC0800163DE0005E87D0000
 #define patch_func2                                 0x5A294 //Found by Joonie
 #define patch_func2_offset                          0x2C //UNTOUCHED
+#define user_thread_prio_patch                          0x201B4 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2                         0x201C0 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_40) // Ported by Joonie Big thanks to @Aldostools for his amazing getsymbol tool, special thanks to @Estwald who is the original creater of this payload
 #define TOC                                         0x3487D0 //done
 #define open_shared_kernel_object_symbol            0x12470 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -744,6 +766,8 @@
 #define memcpy_symbol                               0x7D048 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x4D490 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x4C7A0 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol                                   0x2A02D4 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol                               0x2A4D44 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x4E8B8 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A295A8F8C100C8F8610078
 #define snprintf_symbol                             0x4E824 // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x4D63C // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -827,6 +851,8 @@
 #define process_rtoc_entry_1                            -0x7800 //found at 0x19F83 88003FC0800163DE0005E87D0000
 #define patch_func2                                 0x591DC // Found by Joonie
 #define patch_func2_offset                          0x2C //The same
+#define user_thread_prio_patch                          0x20228 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2                         0x20234 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_41) // Ported by Joonie, Big thanks to @aldostools for his awesome getsymbol tool :) and @Estwald for his original port of mamba.
 #define TOC                                         0x3487E0 //done
 #define open_shared_kernel_object_symbol            0x12474 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -846,6 +872,8 @@
 #define memcpy_symbol                               0x7D04C // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x4D494 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x4C7A4 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol                                   0x2A02E0 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol                               0x2A4D50 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x4E8BC // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A295A8F8C100C8F8610078
 #define snprintf_symbol                             0x4E828 // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x4D640 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -929,6 +957,8 @@
 #define process_rtoc_entry_1                            -0x7800 //found at 0x19F87 88003FC0800163DE0005E87D0000
 #define patch_func2                                 0x591E0 // bytes matched: 0x80  F821FF617C0802A6FBC100907C9E2378E862997038810070FBA10088FBE10098
 #define patch_func2_offset                          0x2C //The same as 4.46
+#define user_thread_prio_patch                          0x2022C // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2                         0x20238 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_41DEX) //Ported by Joonie, Bit thanks to @aldostools for his amazing getsymbol tool :)
 #define TOC                                         0x3665C0 //done
 #define open_shared_kernel_object_symbol            0x12ABC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -948,6 +978,8 @@
 #define memcpy_symbol                               0x81070 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x50D84 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x50094 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x2A8520 // bytes matched: 0x34****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x2ACFA4 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x521AC // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A29688F8C100C8F8610078
 #define snprintf_symbol                             0x52118 // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x50F30 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -1031,6 +1063,8 @@
 #define process_rtoc_entry_1				-0x77A0 //found at 0x1B97F 88603FC0800163DE0005E87D0000
 #define patch_func2                                 0x5CAF8  // Checked //UNTOUCHED
 #define patch_func2_offset                          0x2C //UNTOUCHED //UNTOUCHED
+#define user_thread_prio_patch				0x21C24 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2				0x21C30 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_46)
 #define TOC						0x348DF0
 #define open_shared_kernel_object_symbol		0x12474
@@ -1050,6 +1084,8 @@
 #define memcpy_symbol					0x7D04C
 #define memset_symbol					0x4D494
 #define memcmp_symbol					0x4C7A4
+#define printf_symbol					0x2A0800
+#define printfnull_symbol				0x2A5270
 #define sprintf_symbol					0x4E8BC
 #define snprintf_symbol					0x4E828
 #define strcpy_symbol					0x4D640
@@ -1154,6 +1190,8 @@
 #define memcpy_symbol                               0x81070  // Checked
 #define memset_symbol                               0x50D84  // Checked
 #define memcmp_symbol                               0x50094  // Checked
+#define printf_symbol					0x2A8A40 // bytes matched: 0x34****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x2AD4C4 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x521AC  // Checked
 #define snprintf_symbol                             0x52118  // Checked
 #define strcpy_symbol                               0x50F30  // Checked
@@ -1259,6 +1297,8 @@
 #define memcpy_symbol                               0x7D048 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x4D490 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x4C7A0 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol                                   0x278B08 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol                               0x27D578 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x4E8B8 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A295A8F8C100C8F8610078
 #define snprintf_symbol                             0x4E824 // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x4D63C // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -1342,6 +1382,8 @@
 #define process_rtoc_entry_1                            -0x7800 //found at 0x19F83 88003FC0800163DE0005E87D0000
 #define patch_func2                                 0x591DC // bytes matched: 0x80  F821FF617C0802A6FBC100907C9E2378E862997038810070FBA10088FBE10098
 #define patch_func2_offset                          0x2C //UNTOUCHED
+#define user_thread_prio_patch                          0x20228 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2                         0x20234 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_50DEX)
 #define TOC						0x36EC40 //done
 #define open_shared_kernel_object_symbol		0x12AB8 //done
@@ -1361,6 +1403,8 @@
 #define memcpy_symbol					0x81124 //done
 #define memset_symbol					0x50E38 //done
 #define memcmp_symbol					0x50148 //done
+#define printf_symbol					0x280E08 //done
+#define printfnull_symbol				0x28588C //done
 #define sprintf_symbol					0x52260 //done
 #define snprintf_symbol					0x521CC //done
 #define strcpy_symbol					0x50FE4 //done
@@ -1465,6 +1509,8 @@
 #define memcpy_symbol					0x7D04C //
 #define memset_symbol					0x4D494 //
 #define memcmp_symbol					0x4C7A4 //
+#define printf_symbol					0x278CE0 //
+#define printfnull_symbol				0x27D750 //
 #define sprintf_symbol					0x4E8BC //
 #define snprintf_symbol					0x4E828 //
 #define strcpy_symbol					0x4D640 //
@@ -1569,6 +1615,8 @@
 #define memcpy_symbol                               0x81128 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x50E3C // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x5014C // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x280FE0 // bytes matched: 0x60  F821FF517C0802A6FB610088EB621B98FBA100987C7D1B787F63DB78F8E10100
+#define printfnull_symbol				0x285A64 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x52264 // bytes matched: 0x14  F821FF817C0802A6F8A100C0F8010090380100C0
 #define snprintf_symbol                             0x521D0 // bytes matched: 0x20  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x50FE8 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -1652,6 +1700,8 @@
 #define process_rtoc_entry_1				-0x77A0 //found at 0x1BA37 88603FC0800163DE0005E87D0000
 #define patch_func2                                 0x5CBB0 // bytes matched: 0x10  F821FF617C0802A6FBC100907C9E2378
 #define patch_func2_offset                          0x2C // Done by Joonie
+#define user_thread_prio_patch				0x21CDC // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2				0x21CE8 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_55)
 #define TOC						0x34E620 //
 #define open_shared_kernel_object_symbol		0x12484 //
@@ -1671,6 +1721,8 @@
 #define memcpy_symbol					0x7E488 //
 #define memset_symbol					0x4D6D8 // FIXED!!
 #define memcmp_symbol					0x4C9E8 //
+#define printf_symbol					0x27A530 //
+#define printfnull_symbol				0x27EFA0 //
 #define sprintf_symbol					0x4EB00 //
 #define snprintf_symbol					0x4EA6C //
 #define strcpy_symbol					0x4D884 //
@@ -1775,6 +1827,8 @@
 #define memcpy_symbol                               0x82564 //done
 #define memset_symbol                               0x51080 //done
 #define memcmp_symbol                               0x50390 //done
+#define printf_symbol					0x282838 // bytes matched: 0x34****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x2872BC // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x524A8  //done
 #define snprintf_symbol                             0x52414 //done
 #define strcpy_symbol                               0x5122C //done
@@ -1858,6 +1912,8 @@
 #define process_rtoc_entry_1				-0x77A0 //found at 0x1BC7B 88603FC0800163DE0005E87D0000
 #define patch_func2                                 0x5D360 //done
 #define patch_func2_offset                          0x2C
+#define user_thread_prio_patch				0x21F20 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2				0x21F2C // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_60)
 #define TOC                                         0x34F950 //done
 #define open_shared_kernel_object_symbol            0x1240C // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -1877,6 +1933,8 @@
 #define memcpy_symbol                               0x7E8A0 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x4D668 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x4C978 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol                                   0x279330 // bytes matched: 0x60  F821FF517C0802A6FB610088EB6219C8FBA100987C7D1B787F63DB78F8E10100
+#define printfnull_symbol                               0x27DDA4 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol                              0x4EA90 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A295A8F8C100C8F8610078
 #define snprintf_symbol                             0x4E9FC // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x4D814 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -1960,6 +2018,8 @@
 #define process_rtoc_entry_1                        -0x7800 //found at 0x1A153 88003FC0800163DE0005E87D0000
 #define patch_func2                                 0x59CF8 //unconfirmed //F821FF617C0802A6 FBC100907C9E2378
 #define patch_func2_offset                          0x2C
+#define user_thread_prio_patch                          0x203F8 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2                         0x20404 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_65) // Ported by Habib, Joonie, Haxxxen and Aldostools
 #define TOC						0x34F960 //
 #define open_shared_kernel_object_symbol		0x12410 //
@@ -1979,6 +2039,8 @@
 #define memcpy_symbol					0x7E8A4 //
 #define memset_symbol					0x4D66C //
 #define memcmp_symbol					0x4C97C //
+#define printf_symbol					0x27933C //
+#define printfnull_symbol				0x27DDB0 //
 #define sprintf_symbol					0x4EA94 //
 #define snprintf_symbol					0x4EA00 //
 #define strcpy_symbol					0x4D818 //
@@ -2083,6 +2145,8 @@
 #define memcpy_symbol					0x82980 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol					0x51014 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol					0x50324 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x281608 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x286090 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol					0x5243C // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A29688F8C100C8F8610078
 #define snprintf_symbol					0x523A8 // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol					0x511C0 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -2187,6 +2251,8 @@
 #define memcpy_symbol                                   0x7E8A4 // same as mamba 4.65
 #define memset_symbol                                   0x4D66C // same as mamba 4.65
 #define memcmp_symbol                                   0x4C97C // same as mamba 4.65
+#define printf_symbol					0x27933C //
+#define printfnull_symbol				0x27DDB0 //
 #define sprintf_symbol                                  0x4EA94 // same as mamba 4.65
 #define snprintf_symbol                                 0x4EA00 // same as mamba 4.65
 #define strcpy_symbol                                   0x4D818 // same as mamba 4.65
@@ -2291,6 +2357,8 @@
 #define memcpy_symbol					0x82980 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol					0x51014 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol					0x50324 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x281608 // bytes matched: 0x30****  FBA100987C7D1B787F63DB78F8E10100F9010108F9210110F9410118FB810090
+#define printfnull_symbol				0x286090 // bytes matched: 0x24  386000004E800020F821FF717C0802A6FB810070FBA100787C9C23787C7D1B78
 #define sprintf_symbol					0x5243C // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A29688F8C100C8F8610078
 #define snprintf_symbol					0x523A8 // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol					0x511C0 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -2395,6 +2463,8 @@
 #define memcpy_symbol                               0x7E928 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x4D668 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x4C978 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x270634
+#define printfnull_symbol					0x2750A8
 #define sprintf_symbol                              0x4EA90 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A295A8F8C100C8F8610078
 #define snprintf_symbol                             0x4E9FC // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x4D814 // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001
@@ -2499,6 +2569,8 @@
 #define memcpy_symbol                               0x82A04 // bytes matched: 0x80  2BA500077C6B1B78419D002C2C2500007C691B784D8200207CA903A688040000
 #define memset_symbol                               0x51010 // bytes matched: 0x80  2BA500177C6A1B78419D00242FA500004D9E00207C8023787CA903A6980A0000
 #define memcmp_symbol                               0x50320 // bytes matched: 0x80  38A500017CA903A642400030880300003863000189240000388400017F890000
+#define printf_symbol					0x278900 //  IDA
+#define printfnull_symbol				0x27D388 // IDA
 #define sprintf_symbol                              0x52438 // bytes matched: 0x80  F821FF817C0802A6F8A100C0F8010090380100C0E8A29688F8C100C8F8610078
 #define snprintf_symbol                             0x523A4 // bytes matched: 0x80  F821FF717C0802A6F8C100D8F80100A0380100D8F8610078908100807CA32B78
 #define strcpy_symbol                               0x511BC // bytes matched: 0x80  880400002F800000980300004D9E00207C691B788C0400012F8000009C090001

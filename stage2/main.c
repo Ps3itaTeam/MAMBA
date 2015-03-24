@@ -84,6 +84,7 @@
 #elif defined(FIRMWARE_4_65DEX)
 #define FIRMWARE_VERSION					0x0465
 #elif defined(FIRMWARE_4_66)
+#define FIRMWARE_VERSION					0x0466
 #elif defined(FIRMWARE_4_66DEX)
 #define FIRMWARE_VERSION					0x0466
 #elif defined(FIRMWARE_4_70)
@@ -143,7 +144,7 @@ static INLINE int sys_get_version2(uint16_t *version)
 LV2_SYSCALL2(uint64_t, sys_cfw_lv1_peek, (uint64_t lv1_addr))
 {
 	#ifdef DEBUG
-	DPRINTF("peek %p\n", lv1_addr);
+	DPRINTF("peek %016lx\n", lv1_addr);
 	#endif
 
     uint64_t ret;
@@ -155,7 +156,7 @@ LV2_SYSCALL2(uint64_t, sys_cfw_lv1_peek, (uint64_t lv1_addr))
 LV2_SYSCALL2(void, sys_cfw_lv1_poke, (uint64_t lv1_addr, uint64_t lv1_value))
 {
 	#ifdef DEBUG
-	DPRINTF("poke %p %016lx\n", lv1_addr, lv1_value);
+	DPRINTF("poke %016lx %016lx\n", lv1_addr, lv1_value);
 	#endif
 	
 	lv1_poked(lv1_addr, lv1_value);
@@ -775,9 +776,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 //----------------------------------------
 //KERNEL PATCH
 //----------------------------------------
-#define DO_PATCH
+#define DO_PATCH_KERNEL_PATCH
 //----------------------------------------
-#ifdef DO_PATCH
+#ifdef DO_PATCH_KERNEL_PATCH
 typedef struct
 {
 	uint32_t address;
@@ -786,11 +787,9 @@ typedef struct
 
 static Patch kernel_patches[] =
 {
-	#ifdef user_thread_prio_patch
 	// User thread prio hack (needed for netiso)	
 	{ user_thread_prio_patch, NOP },
 	{ user_thread_prio_patch2, NOP },
-	#endif
 };
 
 #define N_KERNEL_PATCHES	(sizeof(kernel_patches) / sizeof(Patch))
@@ -830,7 +829,7 @@ int main(void)
 	
     storage_ext_init();
     modules_patch_init();
-	#ifdef DO_PATCH
+	#ifdef DO_PATCH_KERNEL_PATCH
 	apply_kernel_patches();	
 	#endif
 	map_path_patches(1);

@@ -3,8 +3,6 @@
 
 #undef  printf
 
-//#define DEBUG
-
 #ifdef DEBUG
 
 #include <debug.h>

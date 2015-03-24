@@ -60,11 +60,12 @@ int sys_storage_ext_umount_discfile(void);
 int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event_queue_t command_queue, int emu_type, uint64_t disc_size_bytes, uint32_t read_size, unsigned int trackscount, ScsiTrackDescriptor *tracks);
 int sys_storage_ext_mount_encrypted_image(char *image, char *mount_point, char *filesystem, uint64_t nonce); 
 
-///////////// PS3MAPI BEGIN //////////////
+
+#ifdef PS3M_API
 
 void unhook_all_storage_ext(void);
 
-///////////// PS3MAPI END //////////////
+#endif
 
 #endif /* __STORAGE_EXT_H__ */
 
