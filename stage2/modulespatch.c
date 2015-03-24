@@ -25,7 +25,7 @@
 //----------------------------------------
 //DYNAMIC MODULES PATCH
 //----------------------------------------
-#define DO_PATCH
+#define DO_PATCH //libfs.sprx
 //----------------------------------------
 
 LV2_EXPORT int decrypt_func(uint64_t *, uint32_t *);
@@ -650,7 +650,7 @@ void modules_patch_init(void)
 	if (!vsh_process) hook_function_on_precall_success(load_process_symbol, load_process_hooked, 9);
 	#else	
 	hook_function_on_precall_success(load_process_symbol, load_process_hooked, 9);	
-	hook_function_on_precall_success(create_process_common_symbol, create_process_common_hooked, 16);
+	//hook_function_on_precall_success(create_process_common_symbol, create_process_common_hooked, 16);
 	//hook_function_with_postcall(create_process_common_symbol, create_process_common_hooked_pre, 8);
 	#endif
 }
@@ -665,7 +665,7 @@ void unhook_all_modules(void)
 	unhook_function_with_postcall(map_process_memory_symbol, pre_map_process_memory, 7);	
 	#ifdef DEBUG
 	unhook_function_on_precall_success(load_process_symbol, load_process_hooked, 9); //unhook it-self if not set to debug
-	unhook_function_on_precall_success(create_process_common_symbol, create_process_common_hooked, 16);
+	//unhook_function_on_precall_success(create_process_common_symbol, create_process_common_hooked, 16);
 	//unhook_function_with_postcall(create_process_common_symbol, create_process_common_hooked_pre, 8);
 	#endif
 	resume_intr();

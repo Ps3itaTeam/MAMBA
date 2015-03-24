@@ -28,18 +28,15 @@ int map_path(char *oldpath, char *newpath, uint32_t flags)
 {
 	int i, firstfree = -1;
 
-	if (!oldpath || strlen(oldpath) == 0)
-		return -1;
+	if (!oldpath || strlen(oldpath) == 0) return -1;
 
-	//DPRINTF("Map path: %s -> %s\n", oldpath, newpath);
+		#ifdef DEBUG
+		DPRINTF("Map path: %s -> %s\n", oldpath, newpath);
+		#endif
 
-	if (newpath && strcmp(oldpath, newpath) == 0)
-		newpath = NULL;
+	if (newpath && strcmp(oldpath, newpath) == 0) newpath = NULL;
 
-	if (strcmp(oldpath, "/dev_bdvd") == 0)
-	{
-		condition_apphome = (newpath != NULL);
-	}
+	if (strcmp(oldpath, "/dev_bdvd") == 0) condition_apphome = (newpath != NULL);
 
 	for (i = 0; i < MAX_TABLE_ENTRIES; i++)
 	{
@@ -56,8 +53,7 @@ int map_path(char *oldpath, char *newpath, uint32_t flags)
 				}
 				else
 				{
-					if (map_table[i].flags & FLAG_COPY)
-						dealloc(map_table[i].oldpath, 0x27);
+					if (map_table[i].flags & FLAG_COPY) dealloc(map_table[i].oldpath, 0x27);
 
 					dealloc(map_table[i].newpath, 0x27);
 					map_table[i].oldpath = NULL;
@@ -68,19 +64,14 @@ int map_path(char *oldpath, char *newpath, uint32_t flags)
 				break;
 			}
 		}
-		else if (firstfree < 0)
-		{
-			firstfree = i;
-		}
+		else if (firstfree < 0) firstfree = i;
 	}
 
 	if (i == MAX_TABLE_ENTRIES)
 	{
-		if (firstfree < 0)
-			return EKRESOURCE;
+		if (firstfree < 0) return EKRESOURCE;
 
-		if (!newpath || strlen(newpath) == 0)
-			return 0;
+		if (!newpath || strlen(newpath) == 0) return 0;
 
 		map_table[firstfree].flags = flags;
 
@@ -91,10 +82,7 @@ int map_path(char *oldpath, char *newpath, uint32_t flags)
 			strncpy(map_table[firstfree].oldpath, oldpath, len);
 			map_table[firstfree].oldpath[len] = 0;
 		}
-		else
-		{
-			map_table[firstfree].oldpath = oldpath;
-		}
+		else map_table[firstfree].oldpath = oldpath;
 
 		map_table[firstfree].newpath = alloc(MAX_PATH, 0x27);
 		strncpy(map_table[firstfree].newpath, newpath, MAX_PATH-1);
@@ -109,19 +97,16 @@ int map_path_user(char *oldpath, char *newpath, uint32_t flags)
 {
 	char *oldp, *newp;
 
-	//DPRINTF("map_path_user, called by process %s: %s -> %s\n", get_process_name(get_current_process_critical()), oldpath, newpath);
-
-	if (oldpath == 0)
-		return -1;
+	#ifdef DEBUG
+	DPRINTF("map_path_user, called by process %s: %s -> %s\n", get_process_name(get_current_process_critical()), oldpath, newpath);
+	#endif
+	
+	if (oldpath == 0) return -1;
 
 	int ret = pathdup_from_user(get_secure_user_ptr(oldpath), &oldp);
-	if (ret != 0)
-		return ret;
+	if (ret != 0) return ret;
 
-	if (newpath == 0)
-	{
-		newp = NULL;
-	}
+	if (newpath == 0) newp = NULL;
 	else
 	{
 		ret = pathdup_from_user(get_secure_user_ptr(newpath), &newp);
@@ -135,8 +120,7 @@ int map_path_user(char *oldpath, char *newpath, uint32_t flags)
 	ret = map_path(oldp, newp, flags | FLAG_COPY);
 
 	dealloc(oldp, 0x27);
-	if (newp)
-		dealloc(newp, 0x27);
+	if (newp) dealloc(newp, 0x27);
 
 	return ret;
 }
@@ -224,7 +208,9 @@ LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 			}
 		}
 
-		//DPRINTF("open_path %s\n", path);
+		#ifdef DEBUG
+		DPRINTF("open_path %s\n", path);
+		#endif
 	}
 }
 
@@ -274,8 +260,7 @@ int sys_aio_copy_root(char *src, char *dst)
 				{
 					dst[j] = map_table[i].newpath[j];
 
-					if (dst[j] == 0)
-						break;
+					if (dst[j] == 0) break;
 
 					if (dst[j] == '/')
 					{
@@ -284,7 +269,9 @@ int sys_aio_copy_root(char *src, char *dst)
 					}
 				}
 
-				//DPRINTF("AIO: root replaced by %s\n", dst);
+				#ifdef DEBUG
+				DPRINTF("AIO: root replaced by %s\n", dst);
+				#endif
 				break;
 			}
 		}
@@ -297,19 +284,16 @@ void map_path_patches(int syscall)
 {
 	hook_function_with_postcall(open_path_symbol, open_path_hook, 2);
 
-	if (syscall)
-		create_syscall2(SYS_MAP_PATH, sys_map_path);
+	if (syscall) create_syscall2(SYS_MAP_PATH, sys_map_path);
 }
 
 
-///////////// PS3MAPI BEGIN //////////////
-
+#ifdef PS3M_API
 void unhook_all_map_path(void)
 {
 	suspend_intr();
 	unhook_function_with_postcall(open_path_symbol, open_path_hook, 2);
 	resume_intr();
 }
-
-///////////// PS3MAPI END //////////////
+#endif
 

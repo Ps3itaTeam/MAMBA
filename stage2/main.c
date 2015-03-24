@@ -23,6 +23,7 @@
 #include <lv2/symbols.h>
 #include <lv1/stor.h>
 #include <lv1/patch.h>
+#include "common.h"
 #include "modulespatch.h"
 #include "mappath.h"
 #include "storage_ext.h"
@@ -39,58 +40,56 @@
 //FIRMWARE DEF
 //----------------------------------------
 
-#if defined(FIRMWARE_3_41)
-#define FIRMWARE_VERSION	0x0341
-#elif defined(FIRMWARE_3_55)
-#define FIRMWARE_VERSION	0x0355
+
+#if defined(FIRMWARE_3_55)
+#define FIRMWARE_VERSION					0x0355
 #elif defined(FIRMWARE_3_55DEX)
-#define FIRMWARE_VERSION	0x0355
+#define FIRMWARE_VERSION					0x0355
 #elif defined(FIRMWARE_4_21)
-#define FIRMWARE_VERSION	0x0421
+#define FIRMWARE_VERSION					0x0421
 #elif defined(FIRMWARE_4_21DEX)
-#define FIRMWARE_VERSION	0x0421
+#define FIRMWARE_VERSION					0x0421
 #elif defined(FIRMWARE_4_30)
-#define FIRMWARE_VERSION	0x0430
-#elif defined(FIRMWARE_4_31)
-#define FIRMWARE_VERSION	0x0431
+#define FIRMWARE_VERSION					0x0430
 #elif defined(FIRMWARE_4_30DEX)
-#define FIRMWARE_VERSION	0x0430
+#define FIRMWARE_VERSION					0x0430
+#elif defined(FIRMWARE_4_31)
+#define FIRMWARE_VERSION					0x0431
 #elif defined(FIRMWARE_4_40)
-#define FIRMWARE_VERSION	0x0440
+#define FIRMWARE_VERSION					0x0440
 #elif defined(FIRMWARE_4_41)
-#define FIRMWARE_VERSION	0x0441
+#define FIRMWARE_VERSION					0x0441
 #elif defined(FIRMWARE_4_41DEX)
-#define FIRMWARE_VERSION	0x0441
+#define FIRMWARE_VERSION					0x0441
 #elif defined(FIRMWARE_4_46)
-#define FIRMWARE_VERSION	0x0446
+#define FIRMWARE_VERSION					0x0446
 #elif defined(FIRMWARE_4_46DEX)
-#define FIRMWARE_VERSION	0x0446
+#define FIRMWARE_VERSION					0x0446
 #elif defined(FIRMWARE_4_50)
-#define FIRMWARE_VERSION	0x0450
+#define FIRMWARE_VERSION					0x0450
 #elif defined(FIRMWARE_4_50DEX)
-#define FIRMWARE_VERSION	0x0450
+#define FIRMWARE_VERSION					0x0450
 #elif defined(FIRMWARE_4_53)
-#define FIRMWARE_VERSION	0x0453
+#define FIRMWARE_VERSION					0x0453
 #elif defined(FIRMWARE_4_53DEX)
-#define FIRMWARE_VERSION	0x0453
+#define FIRMWARE_VERSION					0x0453
 #elif defined(FIRMWARE_4_55)
-#define FIRMWARE_VERSION	0x0455
+#define FIRMWARE_VERSION					0x0455
 #elif defined(FIRMWARE_4_55DEX)
-#define FIRMWARE_VERSION	0x0455
+#define FIRMWARE_VERSION					0x0455
 #elif defined(FIRMWARE_4_60)
-#define FIRMWARE_VERSION	0x0460
+#define FIRMWARE_VERSION					0x0460
 #elif defined(FIRMWARE_4_65)
-#define FIRMWARE_VERSION	0x0465
+#define FIRMWARE_VERSION					0x0465
 #elif defined(FIRMWARE_4_65DEX)
-#define FIRMWARE_VERSION	0x0465
+#define FIRMWARE_VERSION					0x0465
 #elif defined(FIRMWARE_4_66)
-#define FIRMWARE_VERSION	0x0466
 #elif defined(FIRMWARE_4_66DEX)
-#define FIRMWARE_VERSION	0x0466
+#define FIRMWARE_VERSION					0x0466
 #elif defined(FIRMWARE_4_70)
-#define FIRMWARE_VERSION	0x0470
+#define FIRMWARE_VERSION					0x0470
 #elif defined(FIRMWARE_4_70DEX)
-#define FIRMWARE_VERSION	0x0470
+#define FIRMWARE_VERSION					0x0470
 #endif
 
 #define IS_CFW			1
@@ -774,6 +773,41 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 }
 
 //----------------------------------------
+//KERNEL PATCH
+//----------------------------------------
+#define DO_PATCH
+//----------------------------------------
+#ifdef DO_PATCH
+typedef struct
+{
+	uint32_t address;
+	uint32_t data;
+} Patch;
+
+static Patch kernel_patches[] =
+{
+	#ifdef user_thread_prio_patch
+	// User thread prio hack (needed for netiso)	
+	{ user_thread_prio_patch, NOP },
+	{ user_thread_prio_patch2, NOP },
+	#endif
+};
+
+#define N_KERNEL_PATCHES	(sizeof(kernel_patches) / sizeof(Patch))
+
+static INLINE void apply_kernel_patches(void)
+{
+	for (int i = 0; i < N_KERNEL_PATCHES; i++)
+	{
+		uint32_t *addr= (uint32_t *)MKA(kernel_patches[i].address);
+		*addr = kernel_patches[i].data;
+		clear_icache(addr, 4);		
+	}
+}
+
+#endif
+
+//----------------------------------------
 //MAIN
 //----------------------------------------
 
@@ -781,6 +815,14 @@ uint8_t mamba_loaded = 0;
 
 int main(void)
 {
+	#ifdef DEBUG
+	debug_init();
+	debug_install();
+	extern uint64_t _start;
+	extern uint64_t __self_end;
+	DPRINTF("MAMBA says hello (load base = %p, end = %p) (version = %08X)\n", &_start, &__self_end, MAKE_VERSION(MAMBA_VERSION, FIRMWARE_VERSION, IS_CFW));
+	#endif	
+
 	if(mamba_loaded == 1) return 0;
     mamba_loaded = 1;
 	
@@ -788,9 +830,12 @@ int main(void)
 	
     storage_ext_init();
     modules_patch_init();
+	#ifdef DO_PATCH
+	apply_kernel_patches();	
+	#endif
+	map_path_patches(1);
 	if ((storage_ext_patches_done == 0)  && (vsh_process) ) storage_ext_patches();
-    region_patches();
-	map_path_patches(1);	
+    region_patches();	
 	
 	//Check if Iris (sky) payload is loaded
 	extended_syscall8.addr = 0;

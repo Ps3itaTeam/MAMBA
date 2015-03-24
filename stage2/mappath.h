@@ -1,10 +1,8 @@
-//#ifndef __MAPPATH_H__
-//#define __MAPPATH_H__
-
-#include <lv2/memory.h>
+#ifndef __MAPPATH_H__
+#define __MAPPATH_H__
 
 #define SYS_MAP_PATH	35
-#define SYS_MAP_GAME	36
+//#define SYS_MAP_GAME	36
 
 #define FLAG_COPY	1
 #define FLAG_TABLE	2
@@ -20,11 +18,11 @@ int	sys_hermes_pathtable(uint64_t pathtable);*/
 
 int 	sys_aio_copy_root(char *src, char *dst);
 
-///////////// PS3MAPI BEGIN //////////////
+#ifdef PS3M_API
 
 void unhook_all_map_path(void);
 
-///////////// PS3MAPI END //////////////
+#endif
 
-//#endif /* __MAPPATH_H_ */
+#endif /* __MAPPATH_H_ */
 

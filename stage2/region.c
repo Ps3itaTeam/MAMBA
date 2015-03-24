@@ -1,10 +1,9 @@
-//#include <stdio.h>
 #include <lv2/lv2.h>
 #include <lv2/libc.h>
 #include <lv2/process.h>
 #include <lv2/patch.h>
 #include <lv2/syscall.h>
-//#include "common.h"
+#include "common.h"
 #include "region.h"
 
 #define N_PS3_REGIONS	12
@@ -64,13 +63,10 @@ static INLINE void set_dvd_video_region(uint8_t *region)
 				return;
 		}
 		else if (dvd_video_region_map[i].region == dvd_video_region)
-		{
 			fake_region = dvd_video_region_map[i].ps3_region;
-		}
 	}
 	
-	if (fake_region != 0)
-		*region = fake_region;
+	if (fake_region != 0) *region = fake_region;
 }
 
 static INLINE void set_bd_video_region(uint8_t *region)
@@ -85,20 +81,19 @@ static INLINE void set_bd_video_region(uint8_t *region)
 				return;
 		}
 		else if (bd_video_region_map[i].region == bd_video_region)
-		{
 			fake_region = bd_video_region_map[i].ps3_region;
-		}
 	}
 	
-	if (fake_region != 0)
-		*region = fake_region;
+	if (fake_region != 0) *region = fake_region;
 }
 
 LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_2(int, region_func, (uint64_t func, uint8_t *buf))
 {
 	if (func == 0x19004)
 	{
-		//DPRINTF("We are originally in region %02X\n", buf[3]);
+		#ifdef DEBUG
+		DPRINTF("We are originally in region %02X\n", buf[3]);
+		#endif
 		
 		char *procname = get_process_name(get_current_process_critical());
 		if (procname)
@@ -129,7 +124,8 @@ void region_patches(void)
 	hook_function_on_precall_success(get_syscall_address(867), region_func, 2);
 }
 
-///////////// PS3MAPI BEGIN //////////////
+
+#ifdef PS3M_API
 
 void unhook_all_region(void)
 {
@@ -137,5 +133,5 @@ void unhook_all_region(void)
 	unhook_function_on_precall_success(get_syscall_address(867), region_func, 2);
 	resume_intr();
 }
+#endif
 
-///////////// PS3MAPI END //////////////

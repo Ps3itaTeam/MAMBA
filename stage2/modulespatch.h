@@ -3,7 +3,6 @@
 
 #include <lv2/process.h>
 #include <lv2/thread.h>
-#include <lv2/modules.h>
 
 // BIG WARNING: self offsets need to add 0x10000 for address shown in IDA, but not sprxs!
 

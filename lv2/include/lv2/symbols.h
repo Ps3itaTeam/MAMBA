@@ -105,6 +105,8 @@
 #define process_rtoc_entry_1                        -0x77C0
 #define patch_func2                                 0x7A7C4
 #define patch_func2_offset                          0x2C
+#define user_thread_prio_patch						0x20140
+#define user_thread_prio_patch2						0x2014C
 #elif defined(FIRMWARE_3_55DEX) // Ported by Joonie, Big thanks to @aldostools for his amazing tool, special thanks to @Estwald
 #define TOC                                         0x34AC80 //done
 #define open_shared_kernel_object_symbol            0x1288C // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -309,6 +311,8 @@
 #define process_rtoc_entry_1                            -0x7800 //found at 0x19F0F 88003FC0800163DE0005E87D0000
 #define patch_func2                                 0x5A140 // F821FF617C0802A6 FBC100907C9E2378 E862997838810070 FBA10088FBE10098
 #define patch_func2_offset                          0x2C //UNTOUCHED
+#define user_thread_prio_patch						0x201B4 //+ bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2						0x201C0 //+ bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_21DEX) // Ported by Joonie, Big thanks to @aldostools for his awesome getsymbol tool :)
 #define TOC                                         0x363E80 //done
 #define open_shared_kernel_object_symbol            0x12A44 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -411,6 +415,8 @@
 #define process_rtoc_entry_1				-0x77A0 //found at 0x1B907 88603FC0800163DE0005E87D0000
 #define patch_func2                                 0x5DA58  // Found by Joonie //UNTOUCHED
 #define patch_func2_offset                          0x2C //UNTOUCHED //UNTOUCHED //UNTOUCHED //UNTOUCHED
+#define user_thread_prio_patch				0x21BAC //+ <Not found in TOC> bytes matched: 0x30  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2				0x21BB8 //+ <Not found in TOC> bytes matched: 0x24  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 #elif defined(FIRMWARE_4_30)
 #define TOC						0x348200
 #define open_shared_kernel_object_symbol		0x123F8
@@ -513,6 +519,8 @@
 #define process_rtoc_entry_1				-0x7800
 #define patch_func2 					0x5A290
 #define patch_func2_offset 				0x2C
+#define user_thread_prio_patch				0x201B0
+#define user_thread_prio_patch2				0x201BC
 #elif defined(FIRMWARE_4_30DEX) //Ported by Joonie @ Big Thanks to @aldostools for his awesome Getsymbol Tool :)
 #define TOC                                         0x365CA0 //done
 #define open_shared_kernel_object_symbol            0x12A40 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -1125,6 +1133,8 @@
 #define process_rtoc_entry_1				-0x7800
 #define patch_func2 					0x591E0
 #define patch_func2_offset 				0x2C
+#define user_thread_prio_patch				0x2022C
+#define user_thread_prio_patch2				0x20238
 #elif defined(FIRMWARE_4_46DEX) //Ported by  @Joonie,  @Nathan_r32_69 Bit thanks to  @aldostools for his amazing getsymbol tool :)
 #define TOC                                         0x366BD0 // Checked
 #define open_shared_kernel_object_symbol            0x12ABC  // Checked
@@ -1205,8 +1215,8 @@
 #define prx_start_module_symbol                     0x8A54C // Checked
 #define prx_stop_module_symbol                      0x8B924 // Checked
 #define prx_unload_module_symbol                    0x8A280 // Checked
-#define prx_get_module_info_symbol			0x89C78 //
-#define prx_get_module_list_symbol			0x89CF8 //
+#define prx_get_module_info_symbol					0x89C78 //
+#define prx_get_module_list_symbol					0x89CF8 //
 #define extend_kstack_symbol                        0x7225C  // Checked
 #define get_pseudo_random_number_symbol             0x25EBBC // Checked
 #define syscall_table_symbol                        0x37CFE8 // Checked
@@ -1224,9 +1234,11 @@
 #define decrypt_rtoc_entry_2                        -0x65A8 //Found by Joonie
 #define storage_rtoc_entry_1                        0x2370 //Found by Joonie
 #define device_event_rtoc_entry_1                   0x26F8 //Found by Joonie
-#define process_rtoc_entry_1				-0x77A0 //found at 0x1B97F 88603FC0800163DE0005E87D0000
+#define process_rtoc_entry_1						-0x77A0 //found at 0x1B97F 88603FC0800163DE0005E87D0000
 #define patch_func2                                 0x5CAF8  // Checked
 #define patch_func2_offset                          0x2C //UNTOUCHED
+#define user_thread_prio_patch    					0x21C24
+#define user_thread_prio_patch2   					0x21C30
 #elif defined(FIRMWARE_4_50) //Ported by Joonie, Big thanks to @aldostools for his awesome Getsymbols tool, and also Thanks a lot to @Estwald who is the creator of this Mamba payload!!
 #define process_rtoc_entry_1				-0x7800 //
 #define TOC                                         0x34B160 //done
@@ -1432,6 +1444,8 @@
 #define process_rtoc_entry_1				-0x77A0 //done
 #define patch_func2 					0x5CBAC //done
 #define patch_func2_offset 				0x2C
+#define user_thread_prio_patch				0x21CD8 //done
+#define user_thread_prio_patch2				0x21CE4 //done
 #elif defined(FIRMWARE_4_53)
 #define TOC						0x34B2E0 //
 #define open_shared_kernel_object_symbol		0x12474 //
@@ -1534,6 +1548,8 @@
 #define process_rtoc_entry_1				-0x7800 //
 #define patch_func2 					0x591E0 //
 #define patch_func2_offset 				0x2C //
+#define user_thread_prio_patch				0x2022C //
+#define user_thread_prio_patch2				0x20238 //
 #elif defined(FIRMWARE_4_53DEX)                     //Ported by @Joonie, Big Thanks to @aldostools for his awesome GetSymbol Tool :)
 #define TOC                                         0x370620 //done
 #define open_shared_kernel_object_symbol            0x12ABC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -1738,6 +1754,8 @@
 #define process_rtoc_entry_1				-0x7800 //
 #define patch_func2 					0x59990 //
 #define patch_func2_offset 				0x2C //
+#define user_thread_prio_patch				0x20470
+#define user_thread_prio_patch2				0x2047C
 #elif defined(FIRMWARE_4_55DEX)
 #define TOC                                         0x3738E0 //done
 #define open_shared_kernel_object_symbol            0x12ACC //done
@@ -2044,6 +2062,8 @@
 #define process_rtoc_entry_1				-0x7800 //
 #define patch_func2 					0x59CFC //
 #define patch_func2_offset 				0x2C //
+#define user_thread_prio_patch				0x203FC //
+#define user_thread_prio_patch2				0x20408 //
 #elif defined(FIRMWARE_4_65DEX) // Ported by Joonie, special thanks to @aldostools for his awesome Getsymbol tool!!!!
 #define TOC						0x375510 //done
 #define open_shared_kernel_object_symbol		0x12A58 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -2146,6 +2166,8 @@
 #define process_rtoc_entry_1				-0x77A0 //found at 0x1BC07 88603FC0800163DE0005E87D0000
 #define patch_func2 					0x5D6CC // bytes matched: 0x10  F821FF617C0802A6FBC100907C9E2378
 #define patch_func2_offset 				0x2C
+#define user_thread_prio_patch				0x21EAC // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2				0x21EB8
 #elif defined(FIRMWARE_4_66) // Ported by Habib, Joonie, Haxxxen and Aldostools (Sep 11/2014)
 #define TOC                                             0x34F960 // same as mamba 4.65
 #define open_shared_kernel_object_symbol                0x12410 // same as mamba 4.65
@@ -2248,6 +2270,8 @@
 #define process_rtoc_entry_1                            -0x7800 //
 #define patch_func2                                     0x59CFC  // same as mamba 4.65
 #define patch_func2_offset                              0x2C     // same as mamba 4.65
+#define user_thread_prio_patch				0x203FC //
+#define user_thread_prio_patch2				0x20408 //
 #elif defined(FIRMWARE_4_66DEX) // Ported by Joonie, special thanks to @aldostools for his awesome Getsymbol tool!!!!
 #define TOC						0x375510 //done
 #define open_shared_kernel_object_symbol		0x12A58 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -2350,6 +2374,8 @@
 #define process_rtoc_entry_1				-0x77A0 //found at 0x1BC07 88603FC0800163DE0005E87D0000
 #define patch_func2 					0x5D6CC // bytes matched: 0x10  F821FF617C0802A6FBC100907C9E2378
 #define patch_func2_offset 				0x2C
+#define user_thread_prio_patch				0x21EAC // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2				0x21EB8
 #elif defined(FIRMWARE_4_70)
 #define TOC                                         0x34FB10 //done
 #define open_shared_kernel_object_symbol            0x1240C // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -2452,7 +2478,8 @@
 #define process_rtoc_entry_1                        -0x7800 //found at 0x1A153 88003FC0800163DE0005E87D0000
 #define patch_func2                                 0x59D80 // bytes matched: 0x2C  F821FF617C0802A6FBC100907C9E2378E862995838810070FBA10088FBE10098
 #define patch_func2_offset                          0x2C
-
+#define user_thread_prio_patch						0x203F8
+#define user_thread_prio_patch2						0x20404
 #elif defined(FIRMWARE_4_70DEX) // Ported by Joonie, special thanks to @aldostools for his awesome Getsymbol tool!!!!
 #define TOC                                         0x375850 //done
 #define open_shared_kernel_object_symbol            0x12A54 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -2555,6 +2582,8 @@
 #define process_rtoc_entry_1                        -0x77A0 //found at 0x1BC03 88603FC0800163DE0005E87D0000
 #define patch_func2                                 0x5D750 // bytes matched: 0x2C  F821FF617C0802A6FBC100907C9E2378E8629A3838810070FBA10088FBE10098
 #define patch_func2_offset                          0x2C
+#define user_thread_prio_patch						0x21EA8 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
+#define user_thread_prio_patch2						0x21EB4 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
 
 
 #endif /* FIRMWARE */

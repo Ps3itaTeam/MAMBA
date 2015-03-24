@@ -13,10 +13,10 @@ OBJCOPY		:= ppu-objcopy
 OBJDUMP		:= ppu-objdump
 AR 		:= ppu-ar
 STRIP		:= ppu-strip
-INCLUDE		= $(PS3DEV)/ppu/ppu/include lv2/include lv1/include
+INCLUDE		= $(PS3DEV)/ppu/ppu/include lv2/include lv1/include debug/include
 LIBS           	=
 BUILD_TYPE     	= 
-GCC_INCLUDE_DIR = lv2/include lv1/include
+GCC_INCLUDE_DIR = lv2/include lv1/include debug/include
 
 CFLAGS = -ffunction-sections -fdata-sections -O2 -m64 -fno-builtin -fno-exceptions \
 			   -Wall -Wno-strict-aliasing -Wno-multichar $(foreach dir,$(INCLUDE),-I$(dir)) \

@@ -25,7 +25,6 @@
 #include "mappath.h"
 #include "modulespatch.h"
 
-
 #define READ_BUF_SIZE			(256*1024)
 #define READ_BUF_SIZE_SECTORS_PSX	(128)
 #define CD_CACHE_SIZE			(64)
@@ -36,18 +35,10 @@
 #define THREAD_NAME	""
 #endif
 
-#define PS2EMU_STAGE2_FILE	"/dev_hdd0/vm/pm0"
-#define PS2EMU_CONFIG_FILE	"/dev_hdd0/tmp/cfg.bin"
 
 #define MIN(a, b)	((a) <= (b) ? (a) : (b))
 #define ABS(a)		(((a) < 0) ? -(a) : (a))
 
-enum
-{
-	PS2EMU_HW,
-	PS2EMU_GX,
-	PS2EMU_SW
-};
 
 typedef struct _ReadIsoCmd
 {
