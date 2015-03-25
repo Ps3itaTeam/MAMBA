@@ -700,10 +700,10 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 		
 		case SYSCALL8_OPCODE_GET_ACCESS:
+		case SYSCALL8_OPCODE_REMOVE_ACCESS:
 			return 0;//needed for mmCM 
 		break;
 		
-		case SYSCALL8_OPCODE_REMOVE_ACCESS:
 		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
 		case SYSCALL8_OPCODE_SET_PSP_UMDFILE:
 		case SYSCALL8_OPCODE_SET_PSP_DECRYPT_OPTIONS:
