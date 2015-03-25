@@ -954,15 +954,13 @@ int process_get_psx_video_mode(void)
 			if (sector != 0 && read_psx_sector(dma, buf, sector) == 0)
 			{
 				p = strstr(buf, "cdrom");
-				if (!p)
-					p = strstr(buf, "CDROM");
+				if (!p) p = strstr(buf, "CDROM");
 
 				if (p)
 				{
 					p += 5;
 
-					while (*p != 0 && !isalpha(*p))
-						p++;
+					while (*p != 0 && !isalpha(*p)) p++;
 
 					if (*p != 0)
 					{
@@ -977,10 +975,15 @@ int process_get_psx_video_mode(void)
 							p++;
 						}
 
-						strcat(exe_path, ";1");	
-		#ifdef DEBUG
-		DPRINTF("PSX EXE: %s\n", exe_path);
-		#endif
+						strcat(exe_path, ";1");
+						#ifdef DEBUG
+						DPRINTF("PSX EXE: %s\n", exe_path);
+						#endif
+
+						ret = 0;
+
+						p = strstr(buf, "SLES_"); if(p) {ret = 1; goto exit_get_psx_video_mode;}
+						p = strstr(buf, "SCES_"); if(p) {ret = 1; goto exit_get_psx_video_mode;}
 
 						sector = find_file_sector((uint8_t *)buf+2048, exe_path);
 
@@ -988,17 +991,11 @@ int process_get_psx_video_mode(void)
 						{
 							if (strncmp(buf+0x71, "North America", 13) == 0 || strncmp(buf+0x71, "Japan", 5) == 0)
 							{
-								ret = 0;	
-		#ifdef DEBUG
-		DPRINTF("NTSC\n");
-		#endif
+								ret = 0;
 							}
 							else if (strncmp(buf+0x71, "Europe", 6) == 0)
 							{
-								ret = 1;	
-		#ifdef DEBUG
-		DPRINTF("PAL\n");
-		#endif
+								ret = 1;
 							}
 						}
 
@@ -1006,7 +1003,11 @@ int process_get_psx_video_mode(void)
 				}
 			}
 		}
-
+exit_get_psx_video_mode:
+		#ifdef DEBUG
+		if(ret == 0) DPRINTF("NTSC\n");
+		if(ret == 1) DPRINTF("PAL\n");
+		#endif
 		dealloc(exe_path, 0x27);
 		dealloc(buf, 0x27);
 		page_free(NULL, dma, 0x2F);
@@ -1352,7 +1353,7 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_8(int, emu_read_bdvd0, (void *object, uint64_t
 	{
 #ifdef DEBUG
 		DPRINTF("Warning: emu_read_bdvd0 called.\n");
-		//dump_stack_trace2(16);
+		dump_stack_trace2(16);
 
 		if (r7 != 1 || r8 != 0 || r9 != 0 || r10 != 0 || st0 != 0 || st1 != 1)
 		{
@@ -1573,7 +1574,6 @@ int process_generic_iso_scsi_cmd(uint8_t *indata, uint64_t inlen, uint8_t *outda
 				dealloc(resp, 0x27);
 			}	
 		#ifdef DEBUG
-		
 			else
 			{
 				DPRINTF("Event status: %02X\n", cmd->notification_class_request);
@@ -1604,10 +1604,10 @@ int process_generic_iso_scsi_cmd(uint8_t *indata, uint64_t inlen, uint8_t *outda
 			dealloc(resp, 0x27);
 		}
 		break;
-		#ifdef DEBUG
+		/* #ifdef DEBUG //FREEZE PS3 WHEN MOUNT GAME ON MAMBA [NZV]
 		default:
 			DPRINTF("Command %s outlen=%ld\n", get_scsi_cmd_name(indata[0]), outlen);
-		#endif
+		#endif */
 	}
 
 	return 1;

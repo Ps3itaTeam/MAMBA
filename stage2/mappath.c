@@ -28,7 +28,7 @@ int map_path(char *oldpath, char *newpath, uint32_t flags)
 {
 	int i, firstfree = -1;
 
-	if (!oldpath || strlen(oldpath) == 0) return -1;
+	if (!oldpath || strlen(oldpath) == 0)return -1;
 
 		#ifdef DEBUG
 		DPRINTF("Map path: %s -> %s\n", oldpath, newpath);
@@ -183,31 +183,34 @@ LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 	if (path0[0]=='/')
 	{
 		char *path=path0;
-		if(path[1]=='/') path++;
-		for (int i = MAX_TABLE_ENTRIES-1; i >= 0; i--)
+		if(path[1]=='/') path++; //if(path[1]=='/') path++;
+		//if(path[7]=='v' || path[7]=='m')
 		{
-			if (map_table[i].oldpath)
+			#ifdef DEBUG
+			DPRINTF("?: [%s]\n", path);
+			#endif
+			//if(path[1]=='/') DPRINTF("!!! This will usually error out!\n");//path++;
+			//if(path[0]=='/')
+			for (int i = MAX_TABLE_ENTRIES-1; i >= 0; i--)
 			{
-				int len = strlen(map_table[i].oldpath);
-				if (path && strncmp(path, map_table[i].oldpath, len) == 0)
+				if (map_table[i].oldpath)
 				{
-					// Removed (protection of "lambda.db"), not needed anymore
-					/*if (map_table[i].flags & FLAG_PROTECT)
+					int len = strlen(map_table[i].oldpath);
+			
+					if (path && strncmp(path, map_table[i].oldpath, len) == 0)
 					{
-						// In protection, we redirect to everything except kernel, vsh and protected pspemu (maybe more in the future)
-						process_t process = get_current_process();
-
-						if (!process || process == vsh_process || (process->pid == protected_process && protected_process_type >= PROTECTED_PROCESS_PSPEMU))
-							break;
-					}*/
-
-					strcpy(map_table[i].newpath+map_table[i].newpath_len, path+len);
-					set_patched_func_param(1, (uint64_t)map_table[i].newpath);
-					break;
+						strcpy(map_table[i].newpath+map_table[i].newpath_len, path+len);
+						set_patched_func_param(1, (uint64_t)map_table[i].newpath);
+						
+						#ifdef DEBUG
+						DPRINTF("=: [%s]\n", map_table[i].newpath);
+						#endif
+						break;
+					}
 				}
 			}
 		}
-
+		
 		#ifdef DEBUG
 		DPRINTF("open_path %s\n", path);
 		#endif
