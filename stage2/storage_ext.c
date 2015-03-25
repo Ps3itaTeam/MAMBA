@@ -1352,12 +1352,12 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_8(int, emu_read_bdvd0, (void *object, uint64_t
 	{
 #ifdef DEBUG
 		DPRINTF("Warning: emu_read_bdvd0 called.\n");
-		dump_stack_trace2(16);
+		//dump_stack_trace2(16);
 
 		if (r7 != 1 || r8 != 0 || r9 != 0 || r10 != 0 || st0 != 0 || st1 != 1)
 		{
 			DPRINTF("emu_read_bdvd called with unknown params\n");
-			dump_stack_trace2(16);
+			//dump_stack_trace2(16);
 			fatal("aborting.\n");
 		}
 #endif
@@ -2469,6 +2469,7 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, emu_disc_auth, (uint64_t func, uint64_t
 
 	return DO_POSTCALL;
 }
+
 
 LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *block_dev, const char *filesystem, const char *mount_point, int unk, int read_only, int unk2, char *argv[], int argc))
 {

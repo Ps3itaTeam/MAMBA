@@ -699,7 +699,10 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			return sys_aio_copy_root((char *)param1, (char *)param2);
 		break;
 		
-	    case SYSCALL8_OPCODE_GET_ACCESS:
+		case SYSCALL8_OPCODE_GET_ACCESS:
+			return 0;//needed for mmCM 
+		break;
+		
 		case SYSCALL8_OPCODE_REMOVE_ACCESS:
 		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
 		case SYSCALL8_OPCODE_SET_PSP_UMDFILE:
@@ -814,6 +817,8 @@ uint8_t mamba_loaded = 0;
 
 int main(void)
 {
+	if(mamba_loaded == 1) return 0;
+    mamba_loaded = 1;
 	#ifdef DEBUG
 	debug_init();
 	debug_install();
@@ -821,12 +826,8 @@ int main(void)
 	extern uint64_t __self_end;
 	DPRINTF("MAMBA says hello (load base = %p, end = %p) (version = %08X)\n", &_start, &__self_end, MAKE_VERSION(MAMBA_VERSION, FIRMWARE_VERSION, IS_CFW));
 	#endif	
-
-	if(mamba_loaded == 1) return 0;
-    mamba_loaded = 1;
 	
 	if (!vsh_process) vsh_process = get_vsh_process(); //NzV 
-	
     storage_ext_init();
     modules_patch_init();
 	#ifdef DO_PATCH_KERNEL_PATCH

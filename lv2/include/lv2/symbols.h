@@ -2499,7 +2499,7 @@
 #define event_queue_destroy_symbol                  0x13304 // bytes matched: 0x4C  F821FF717C0802A6FBC10080EBC2859038800000F80100A0FBA1007838A00000
 #define event_queue_receive_symbol                  0x13148 // bytes matched: 0x80  F821FF617C0802A6FBE10098F80100B0812300883FE08001380000002F890001
 #define cellFsOpen_symbol                           0x297888 // bytes matched: 0x1C  F821FF517C0802A6FB010070FB610088FBA10098FBC100A07C7D1B78
-#define cellFsClose_symbol                          0x29BD04 // bytes matched: 0x10  F821FF617C0802A6FBC10090EBC225B0
+#define cellFsClose_symbol                          0x2976F0 // bytes matched: 0x10  F821FF617C0802A6FBC10090EBC225B0
 #define cellFsRead_symbol                           0x29782C // bytes matched: 0x34  2C2600007C0802A63D208001F821FF71FBE10080F80100A07CDF33786129000D
 #define cellFsWrite_symbol                          0x297798 // bytes matched: 0x24****  FB410080FB6100887CDA33787CBB2B78FB810090FBA100987C9C2378F80100C0
 #define cellFsLseek_symbol                          0x296E20 // bytes matched: 0x24****  FB410080FB6100887CDA33787C9B2378FB810090FBA100987CBC2B78F80100C0
