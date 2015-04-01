@@ -378,7 +378,6 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
     }
 
     *ptr = value;
-    return;
 }
 
 //----------------------------------------
@@ -386,7 +385,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 //----------------------------------------
 
 #ifdef PS3M_API
-static void unhook_all(void)
+static inline void ps3mapi_unhook_all(void)
 {
 	unhook_all_modules();
 	unhook_all_region();
@@ -400,7 +399,7 @@ static void unhook_all(void)
 //----------------------------------------
 
 #ifdef PS3M_API
-int partial_disable_syscall8 = 0;
+int ps3mapi_partial_disable_syscall8 = 0;
 #endif
 
 LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t param2, uint64_t param3, uint64_t param4, uint64_t param5, uint64_t param6, uint64_t param7))
@@ -458,25 +457,27 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	}
 	
 	#ifdef PS3M_API
-	if (3 <= partial_disable_syscall8)
+	if (3 <= ps3mapi_partial_disable_syscall8)
 	{
 		if (function == SYSCALL8_OPCODE_PS3MAPI)
 		{
 			if ((int)param1 == PS3MAPI_OPCODE_PDISABLE_SYSCALL8)
 			{
-				partial_disable_syscall8 = (int)param2;
+				ps3mapi_partial_disable_syscall8 = (int)param2;
 				return SUCCEEDED;
 			}
 			else if ((int)param1 == PS3MAPI_OPCODE_PCHECK_SYSCALL8)
 			{
-				return partial_disable_syscall8;
+				return ps3mapi_partial_disable_syscall8;
 			}
 			return ENOSYS;
 		}
 		return ENOSYS;
 	}
+	
+	if ((function != SYSCALL8_OPCODE_PS3MAPI) && (2 <= ps3mapi_partial_disable_syscall8))	return ENOSYS;	
 	#endif
-
+	
 	switch (function)
 	{       	
 		#ifdef PS3M_API
@@ -543,6 +544,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_UNLOAD_PROC_MODULE:
 					return ps3mapi_unload_process_modules((process_id_t)param2, (sys_prx_id_t)param3);
 				break;
+				//----------
+				//VSH PLUGINS
+				//----------
 				case PS3MAPI_OPCODE_UNLOAD_VSH_PLUGIN:
 					return ps3mapi_unload_vsh_plugin((char *)param2);
 				break;
@@ -559,17 +563,17 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 					return ps3mapi_check_syscall((int)param2);
 				break;
 				case PS3MAPI_OPCODE_PDISABLE_SYSCALL8:
-					partial_disable_syscall8 = (int)param2;
+					ps3mapi_partial_disable_syscall8 = (int)param2;
 					return SUCCEEDED;
 				break;
 				case PS3MAPI_OPCODE_PCHECK_SYSCALL8:
-					return partial_disable_syscall8;
+					return ps3mapi_partial_disable_syscall8;
 				break;
 				//----------
 				//REMOVE HOOK
 				//----------
 				case PS3MAPI_OPCODE_REMOVE_HOOK:
-					unhook_all(); //Remove "MAMBA/COBRA HOOK" their are no more needed.
+					ps3mapi_unhook_all();
 					return SUCCEEDED;
 				break;
 				//-----------------------------------------------
@@ -596,7 +600,6 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			}
 		break;
 		
-		if (2 <= partial_disable_syscall8)	return ENOSYS;	
 		#endif
 		
 		#ifdef KW_STEALTH_EXT
@@ -608,7 +611,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		{
 				uint64_t syscall_not_impl = *(uint64_t *)MKA(syscall_table_symbol);
 				#ifdef PS3M_API
-				partial_disable_syscall8 = 2; //Keep PS3M_API Features only.
+				ps3mapi_partial_disable_syscall8 = 2; //Keep PS3M_API Features only.
 				#else
 				*(uint64_t *)MKA(syscall_table_symbol+ 8* 8) = syscall_not_impl;
 				#endif
@@ -729,7 +732,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 
         default:		
 		#ifdef PS3M_API
-		if (1 <= partial_disable_syscall8)	return ENOSYS;
+		if (1 <= ps3mapi_partial_disable_syscall8)	return ENOSYS;
 		#endif		
 		if (extended_syscall8.addr)
 		{

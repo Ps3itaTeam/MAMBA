@@ -182,12 +182,22 @@ LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 {
 	if (path0[0]=='/')
 	{
-		char *path=path0;
-		if(path[1]=='/') path++; //if(path[1]=='/') path++;
+        char *path=path0;
+        if(path[1]=='/') path++; //if(path[1]=='/') path++;
+        if (path && ((strcmp(path, "/dev_bdvd/PS3_UPDATE/PS3UPDAT.PUP") == 0) || (strcmp(path, "/dev_bdvd/PS3/UPDATE/PS3UPDAT.PUP") == 0)))
+        {    
+            char not_update[40];
+            sprintf(not_update, "/dev_bdvd/PS3_NOT_UPDATE/PS3UPDAT.PUP");
+            set_patched_func_param(1, (uint64_t)not_update);
+			#ifdef  DEBUG
+			DPRINTF("Update from disc blocked!\n");
+			#endif 
+        }
+		else
 		//if(path[7]=='v' || path[7]=='m')
 		{
 			#ifdef DEBUG
-			DPRINTF("?: [%s]\n", path);
+			//DPRINTF("?: [%s]\n", path);
 			#endif
 			//if(path[1]=='/') DPRINTF("!!! This will usually error out!\n");//path++;
 			//if(path[0]=='/')
@@ -203,7 +213,7 @@ LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 						set_patched_func_param(1, (uint64_t)map_table[i].newpath);
 						
 						#ifdef DEBUG
-						DPRINTF("=: [%s]\n", map_table[i].newpath);
+						//DPRINTF("=: [%s]\n", map_table[i].newpath);
 						#endif
 						break;
 					}

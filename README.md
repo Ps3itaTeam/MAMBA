@@ -44,11 +44,11 @@ directly from the process list, no more need to reload a self to get it]
 
 
 6) Multiman is blocked to avoid problems to the users (reboot the console to use it)
-
+[NZV 03/2015 This restriction is now removed]
 
 
 7) 'Mamba' is loaded AFTER of syscall8 Iris Manager payload and uses it for example, for HTAB method.
-
+[NZV 03/2015 Mamba as now is own payload to load it)
 
 
 8) 'Mamba' can be detected using the sys8_mamba() syscalls from Iris Manager: if it return 0x666 is 'Mamba' 
