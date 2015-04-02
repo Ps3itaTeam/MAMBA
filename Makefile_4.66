@@ -29,8 +29,8 @@ ifeq ($(BUILD_TYPE), debug)
 CFLAGS += -DDEBUG -DTEST 
 endif
 
-LDFLAGS= -T stage2.ld -nostartfiles -nostdlib -nodefaultlibs -Wl,-static -L. $(foreach dir,$(LIBSDIR),-L$(dir)) $(LIBS) \
-	 -Wl,--gc-sections -Wl,-Map=stage2.map
+LDFLAGS= -T stage2/stage2.ld -nostartfiles -nostdlib -nodefaultlibs -Wl,-static -L. $(foreach dir,$(LIBSDIR),-L$(dir)) $(LIBS) \
+	 -Wl,--gc-sections -Wl,-Map=stage2/stage2.map
 
 OBJS = stage2/start.o stage2/main.o stage2/ps3mapi_core.o stage2/mappath.o stage2/storage_ext.o stage2/crypto.o stage2/modulespatch.o stage2/config.o stage2/region.o \
 	lv2/src/patch.o lv2/src/interrupt.o lv2/src/interrupt_c.o lv2/src/io.o lv2/src/libc.o \
@@ -52,7 +52,7 @@ objdump: stage$(MAMBA_VER).bin
 	$(OBJCOPY) -O binary $< $@	
 	$(ZLIBUTIL) mamba_$(MAMBA_VER).bin mamba_$(MAMBA_VER).lz.bin
 
-mamba_$(MAMBA_VER).elf: $(OBJS) stage2.ld
+mamba_$(MAMBA_VER).elf: $(OBJS) stage2/stage2.ld
 	$(CC) $(LDFLAGS) -o $@ $(OBJS)
 
 %.o: %.S
@@ -62,4 +62,4 @@ mamba_$(MAMBA_VER).elf: $(OBJS) stage2.ld
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o *.elf *.map stage2/*.o lv2/src/*.o lv1/src/*.o debug/src/*.o  
+	rm -f *.o *.elf stage2/*.map stage2/*.o lv2/src/*.o lv1/src/*.o debug/src/*.o  
