@@ -126,7 +126,7 @@ static DiscFileProxy *discfile_proxy;
 static int disc_being_mounted = 0;
 static int could_not_read_disc;
 
-static int video_mode = -2;
+//static int video_mode = -2;
 
 static char *encrypted_image;
 static int encrypted_image_fd = -1;
@@ -852,7 +852,7 @@ int process_fake_storage_event_cmd(FakeStorageEventCmd *cmd)
 int emu_read_bdvd1(void *object, void *buf, uint64_t size, uint64_t offset);
 int emu_storage_read(device_handle_t device_handle, uint64_t unk, uint64_t start_sector, uint32_t sector_count, void *buf, uint32_t *nread, uint64_t unk2);
 
-int read_psx_sector(void *dma, void *buf, uint64_t sector)
+/* int read_psx_sector(void *dma, void *buf, uint64_t sector)
 {
 	if (disc_emulation == EMU_OFF)
 	{
@@ -908,9 +908,9 @@ int read_psx_sector(void *dma, void *buf, uint64_t sector)
 	}
 
 	return -1;
-}
+} */
 
-uint32_t find_file_sector(uint8_t *buf, char *file)
+/* uint32_t find_file_sector(uint8_t *buf, char *file)
 {
 	uint8_t *p =  (uint8_t *)buf;
 	int len = strlen(file);
@@ -931,9 +931,9 @@ uint32_t find_file_sector(uint8_t *buf, char *file)
 		#endif
 
 	return 0;
-}
+} */
 
-int process_get_psx_video_mode(void)
+/* int process_get_psx_video_mode(void)
 {
 	int ret = -1;
 
@@ -1013,7 +1013,7 @@ exit_get_psx_video_mode:
 	}
 
 	return ret;
-}
+} */
 
 void dispatch_thread_entry(uint64_t arg)
 {
@@ -1065,9 +1065,9 @@ void dispatch_thread_entry(uint64_t arg)
 				cmd_result = process_fake_storage_event_cmd((FakeStorageEventCmd *)event.data2);
 			break;
 
-			case CMD_GET_PSX_VIDEO_MODE:
+			/* case CMD_GET_PSX_VIDEO_MODE:
 				cmd_result = process_get_psx_video_mode();
-			break;
+			break; */
 		}
 
 		event_port_send(result_port, cmd_result, 0, 0);
@@ -1080,7 +1080,7 @@ void dispatch_thread_entry(uint64_t arg)
 	ppu_thread_exit(0);
 }
 
-static int read_real_disc_sector (void *buf, uint64_t lba, uint32_t size, int retries)
+/* static int read_real_disc_sector (void *buf, uint64_t lba, uint32_t size, int retries)
 {
 	ReadDiscCmd cmd;
 	int ret = -1;
@@ -1095,7 +1095,7 @@ static int read_real_disc_sector (void *buf, uint64_t lba, uint32_t size, int re
 
 	for (int i = 0; i < retries && ret != 0; i++)
 	{
-		if (0/*!loop*/)
+		if (0)//!loop)
 		{
 			event_t event;
 
@@ -1120,9 +1120,9 @@ static int read_real_disc_sector (void *buf, uint64_t lba, uint32_t size, int re
 	}
 
 	return ret;
-}
+} */
 
-int is_psx(int check_ps2)
+/* int is_psx(int check_ps2)
 {
 	uint8_t *buf;
 	int result;
@@ -1173,7 +1173,7 @@ int is_psx(int check_ps2)
 	}
 
 	return ret;
-}
+} */
 
 void process_disc_insert(uint32_t disctype)
 {
@@ -1210,7 +1210,7 @@ void process_disc_insert(uint32_t disctype)
 			}
 		break;
 
-		case EMU_PSX:
+/* 		case EMU_PSX:
 			if (real_disctype != DEVICE_TYPE_PSX_CD)
 			{
 				fake_disctype = effective_disctype = DEVICE_TYPE_PSX_CD;
@@ -1222,7 +1222,7 @@ void process_disc_insert(uint32_t disctype)
 			{
 				fake_disctype = effective_disctype = DEVICE_TYPE_PS2_CD;
 			}
-		break;
+		break; */
 
 		case EMU_PS2_DVD:
 			if (real_disctype != DEVICE_TYPE_PS2_DVD)
@@ -1232,7 +1232,7 @@ void process_disc_insert(uint32_t disctype)
 		break;
 
 		case EMU_OFF:
-			if (real_disctype == DEVICE_TYPE_CD)
+			/* if (real_disctype == DEVICE_TYPE_CD)
 			{
 				int psx_type = is_psx(1);
 
@@ -1248,13 +1248,13 @@ void process_disc_insert(uint32_t disctype)
 				}
 			}
 
-			else if (real_disctype == DEVICE_TYPE_DVD)
+			if (real_disctype == DEVICE_TYPE_DVD)
 			{
 				if (is_psx(0))
 				{
 					fake_disctype = effective_disctype = DEVICE_TYPE_PS2_DVD;
 				}
-			}
+			}*/
 		break;
 	}
 	
@@ -1297,10 +1297,10 @@ LV2_PATCHED_FUNCTION(int, device_event, (event_port_t event_port, uint64_t event
 		DPRINTF("Disc removed.\n");
 		#endif
 
-			if (effective_disctype == DEVICE_TYPE_PSX_CD)
+			/* if (effective_disctype == DEVICE_TYPE_PSX_CD)
 			{
 				video_mode = -1;
-			}
+			} */
 
 			real_disctype = 0;
 			effective_disctype = 0;
@@ -2135,7 +2135,7 @@ int process_cd_iso_scsi_cmd(uint8_t *indata, uint64_t inlen, uint8_t *outdata, u
 	return 0;
 }
 
-static INLINE int get_psx_video_mode(void)
+/* static INLINE int get_psx_video_mode(void)
 {
 	int ret = -1;
 	event_t event;
@@ -2147,9 +2147,9 @@ static INLINE int get_psx_video_mode(void)
 	}
 
 	return ret;
-}
+} */
 
-static INLINE void do_video_mode_patch(void)
+/* static INLINE void do_video_mode_patch(void)
 {
 	process_t p = get_current_process_critical();
 
@@ -2189,7 +2189,7 @@ static INLINE void do_video_mode_patch(void)
 			video_mode = -2;
 		}
 	}
-}
+} */
 
 int process_cmd(unsigned int command, void *indata, uint64_t inlen, void *outdata, uint64_t outlen)
 {
@@ -2199,7 +2199,7 @@ int process_cmd(unsigned int command, void *indata, uint64_t inlen, void *outdat
 	{
 		case STORAGE_COMMAND_GET_DEVICE_SIZE:
 
-			do_video_mode_patch();
+			//do_video_mode_patch();
 
 			if (disc_emulation != EMU_OFF)
 			{
@@ -2241,7 +2241,7 @@ int process_cmd(unsigned int command, void *indata, uint64_t inlen, void *outdat
 
 		case STORAGE_COMMAND_NATIVE:
 		{
-			uint8_t cmd = *(uint8_t *)indata;
+			/*uint8_t cmd = *(uint8_t *)indata;
 
 			if ((effective_disctype == DEVICE_TYPE_PSX_CD || effective_disctype == DEVICE_TYPE_PS2_CD
 				|| effective_disctype == DEVICE_TYPE_PS2_DVD) && cmd == SCSI_CMD_GET_CONFIGURATION)
@@ -2249,7 +2249,7 @@ int process_cmd(unsigned int command, void *indata, uint64_t inlen, void *outdat
 				// Region bypass on original psx/ps2 disc
 				memset(outdata, 0, outlen);
 				return 1;
-			}
+			} */
 
 			if (disc_emulation != EMU_OFF)
 			{
@@ -2257,10 +2257,10 @@ int process_cmd(unsigned int command, void *indata, uint64_t inlen, void *outdat
 				{
 					return process_cd_iso_scsi_cmd(indata, inlen, outdata, outlen, 0);
 				}
-				else if (disc_emulation == EMU_PS2_CD)
+				/* else if (disc_emulation == EMU_PS2_CD)
 				{
 					return process_cd_iso_scsi_cmd(indata, inlen, outdata, outlen, 1);
-				}
+				} */
 				else
 				{
 					if (total_emulation)
@@ -2410,7 +2410,7 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, emu_disc_auth, (uint64_t func, uint64_t
 	{
 		uint32_t param5004 = param;
 
-		if (param5004 == 1) /* Auth psx disc */
+		/* if (param5004 == 1) // Auth psx disc 
 		{
 			if (!vsh_process) vsh_process = get_vsh_process(); //NzV
 			if (vsh_process && get_current_process_critical() == vsh_process && effective_disctype == DEVICE_TYPE_PSX_CD)
@@ -2419,7 +2419,7 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, emu_disc_auth, (uint64_t func, uint64_t
 				return 0;
 			}
 		}
-		else if (param5004 == 0x29)
+		else */ if (param5004 == 0x29)
 		{
 			if (!vsh_process) vsh_process = get_vsh_process(); //NzV
 			if (vsh_process && get_current_process_critical() == vsh_process)
@@ -2654,7 +2654,7 @@ int mount_bd_discfile(unsigned int filescount, char *files[])
 	return ret;
 }
 
-int mount_ps_cd(char *file, unsigned int trackscount, ScsiTrackDescriptor *tracks)
+/* int mount_ps_cd(char *file, unsigned int trackscount, ScsiTrackDescriptor *tracks)
 {
 	int ret;
 	int len;
@@ -2720,9 +2720,9 @@ int mount_ps_cd(char *file, unsigned int trackscount, ScsiTrackDescriptor *track
 	}
 
 	return ret;
-}
+} */
 
-int mount_psx_discfile(char *file, unsigned int trackscount, ScsiTrackDescriptor *tracks)
+/* int mount_psx_discfile(char *file, unsigned int trackscount, ScsiTrackDescriptor *tracks)
 {
 	int ret;
 
@@ -2737,9 +2737,9 @@ int mount_psx_discfile(char *file, unsigned int trackscount, ScsiTrackDescriptor
 
 	mutex_unlock(mutex);
 	return ret;
-}
+} */
 
-int mount_ps2_discfile(unsigned int filescount, char *files[], unsigned int trackscount, ScsiTrackDescriptor *tracks)
+/* int mount_ps2_discfile(unsigned int filescount, char *files[], unsigned int trackscount, ScsiTrackDescriptor *tracks)
 {
 	int is_cd = 0;
 	int is_2352 = 0;
@@ -2808,7 +2808,7 @@ int mount_ps2_discfile(unsigned int filescount, char *files[], unsigned int trac
 
 	mutex_unlock(mutex);
 	return ret;
-}
+} */
 
 int umount_discfile(void)
 {
@@ -3050,7 +3050,7 @@ int sys_storage_ext_mount_bd_discfile(unsigned int filescount, char *files[])
 	return ret;
 }
 
-int sys_storage_ext_mount_psx_discfile(char *file, unsigned int trackscount, ScsiTrackDescriptor *tracks)
+/* int sys_storage_ext_mount_psx_discfile(char *file, unsigned int trackscount, ScsiTrackDescriptor *tracks)
 {
 	file = get_secure_user_ptr(file);
 	tracks = get_secure_user_ptr(tracks);
@@ -3061,9 +3061,9 @@ int sys_storage_ext_mount_psx_discfile(char *file, unsigned int trackscount, Scs
 	umount_discfile();
 
 	return mount_psx_discfile(file, trackscount, tracks);
-}
+} */
 
-int sys_storage_ext_mount_ps2_discfile(unsigned int filescount, char *files[], unsigned int trackscount, ScsiTrackDescriptor *tracks)
+/* int sys_storage_ext_mount_ps2_discfile(unsigned int filescount, char *files[], unsigned int trackscount, ScsiTrackDescriptor *tracks)
 {
 	char **array = copy_user_pointer_array(files, filescount);
 	if (!array)
@@ -3081,7 +3081,7 @@ int sys_storage_ext_mount_ps2_discfile(unsigned int filescount, char *files[], u
 	int ret = mount_ps2_discfile(filescount, array, trackscount, tracks);
 	dealloc(array, 0x27);
 	return ret;
-}
+} */
 
 int sys_storage_ext_umount_discfile(void)
 {
@@ -3104,7 +3104,7 @@ int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event
 	if (process != vsh_process)
 		return ENOSYS;
 
-	if (emu_type <= EMU_OFF || emu_type >= EMU_MAX || emu_type == EMU_PS2_CD || emu_type == EMU_PS2_DVD)
+	if (emu_type <= EMU_OFF || emu_type >= EMU_MAX /* || emu_type == EMU_PS2_CD || emu_type == EMU_PS2_DVD */)
 		return EINVAL;
 
 	// -- AV: cd sector size
@@ -3113,11 +3113,11 @@ int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event
 	trackscount &= 0xff;
 	// --
 
-	if (emu_type == EMU_PSX)
+	/* if (emu_type == EMU_PSX)
 	{
 		if (trackscount >= 100 || !tracks)
 			return EINVAL;
-	}
+	} */
 
 	table = process->object_table;
 
@@ -3176,11 +3176,11 @@ int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event
 	#endif
 	if (ret == 0)
 	{
-		if (emu_type == EMU_PSX)
+		/* if (emu_type == EMU_PSX)
 		{
 			discfile_proxy = alloc(sizeof(DiscFileProxy) + (trackscount * sizeof(ScsiTrackDescriptor)), 0x27);
 		}
-		else
+		else */
 		{
 			discfile_proxy = alloc(sizeof(DiscFileProxy), 0x27);
 		}
@@ -3189,14 +3189,14 @@ int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event
 		discfile_proxy->read_size = read_size;
 		discfile_proxy->cached_sector = NULL;
 
-		if (emu_type == EMU_PSX)
+		/* if (emu_type == EMU_PSX)
 		{
 			tracks = get_secure_user_ptr(tracks);
 			discfile_proxy->numtracks = trackscount;
 			discfile_proxy->tracks = (ScsiTrackDescriptor *)(discfile_proxy+1);
 			copy_from_user(tracks, discfile_proxy->tracks, sizeof(ScsiTrackDescriptor)*trackscount);
 		}
-		else
+		else */
 		{
 			discfile_proxy->numtracks = 0;
 			discfile_proxy->tracks = NULL;

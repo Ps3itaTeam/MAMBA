@@ -413,12 +413,13 @@ void pre_map_process_memory(void *object, uint64_t process_addr, uint64_t size, 
 LV2_HOOKED_FUNCTION_POSTCALL_7(void, pre_map_process_memory, (void *object, uint64_t process_addr, uint64_t size, uint64_t flags, void *unk, void *elf, uint64_t *out))
 {
 	#ifdef DEBUG
-	DPRINTF("Map %lx %lx %s\n", process_addr, size, get_current_process() ? get_process_name(get_current_process())+8 : "KERNEL");
+	DPRINTF("Map %lx %lx %s %lx\n", process_addr, size, get_current_process() ? get_process_name(get_current_process())+8 : "KERNEL", flags);
 	#endif
 	// Not the call address, but the call to the caller (process load code for .self)
 	if (get_call_address(1) == (void *)MKA(process_map_caller_call))
-	{
-		if (flags == 0x2008004) set_patched_func_param(4, 0x2004004); // Change flags, RX -> RWX, make all process memory writable.
+	{	
+		if (flags != 0x2004004) set_patched_func_param(4, 0x2004004); // Change flags to RWX, make all process memory writable.
+		//if (flags == 0x2008004) set_patched_func_param(4, 0x2004004); // Change flags, RX -> RWX, make all process memory writable.
 	}	
 }
 #endif

@@ -35,69 +35,11 @@
 #include "ps3mapi_core.h"
 #endif
 
-
-//----------------------------------------
-//FIRMWARE DEF
-//----------------------------------------
-
-
-#if defined(FIRMWARE_3_55)
-#define FIRMWARE_VERSION					0x0355
-#elif defined(FIRMWARE_3_55DEX)
-#define FIRMWARE_VERSION					0x0355
-#elif defined(FIRMWARE_4_21)
-#define FIRMWARE_VERSION					0x0421
-#elif defined(FIRMWARE_4_21DEX)
-#define FIRMWARE_VERSION					0x0421
-#elif defined(FIRMWARE_4_30)
-#define FIRMWARE_VERSION					0x0430
-#elif defined(FIRMWARE_4_30DEX)
-#define FIRMWARE_VERSION					0x0430
-#elif defined(FIRMWARE_4_31)
-#define FIRMWARE_VERSION					0x0431
-#elif defined(FIRMWARE_4_40)
-#define FIRMWARE_VERSION					0x0440
-#elif defined(FIRMWARE_4_41)
-#define FIRMWARE_VERSION					0x0441
-#elif defined(FIRMWARE_4_41DEX)
-#define FIRMWARE_VERSION					0x0441
-#elif defined(FIRMWARE_4_46)
-#define FIRMWARE_VERSION					0x0446
-#elif defined(FIRMWARE_4_46DEX)
-#define FIRMWARE_VERSION					0x0446
-#elif defined(FIRMWARE_4_50)
-#define FIRMWARE_VERSION					0x0450
-#elif defined(FIRMWARE_4_50DEX)
-#define FIRMWARE_VERSION					0x0450
-#elif defined(FIRMWARE_4_53)
-#define FIRMWARE_VERSION					0x0453
-#elif defined(FIRMWARE_4_53DEX)
-#define FIRMWARE_VERSION					0x0453
-#elif defined(FIRMWARE_4_55)
-#define FIRMWARE_VERSION					0x0455
-#elif defined(FIRMWARE_4_55DEX)
-#define FIRMWARE_VERSION					0x0455
-#elif defined(FIRMWARE_4_60)
-#define FIRMWARE_VERSION					0x0460
-#elif defined(FIRMWARE_4_65)
-#define FIRMWARE_VERSION					0x0465
-#elif defined(FIRMWARE_4_65DEX)
-#define FIRMWARE_VERSION					0x0465
-#elif defined(FIRMWARE_4_66)
-#define FIRMWARE_VERSION					0x0466
-#elif defined(FIRMWARE_4_66DEX)
-#define FIRMWARE_VERSION					0x0466
-#elif defined(FIRMWARE_4_70)
-#define FIRMWARE_VERSION					0x0470
-#elif defined(FIRMWARE_4_70DEX)
-#define FIRMWARE_VERSION					0x0470
-#endif
-
-#define IS_CFW			1
-
 //----------------------------------------
 //VERSION
 //----------------------------------------
+
+#define IS_CFW			1
 
 #define MAMBA_VERSION		0x0F
 #define MAMBA_VERSION_BCD	0x0800
@@ -668,11 +610,13 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_PSX_DISCFILE:
-			return sys_storage_ext_mount_psx_discfile((char *)param1, param2, (ScsiTrackDescriptor *)param3);
+			return ENOSYS;
+			//return sys_storage_ext_mount_psx_discfile((char *)param1, param2, (ScsiTrackDescriptor *)param3);
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_PS2_DISCFILE:
-			return sys_storage_ext_mount_ps2_discfile(param1, (char **)param2, param3, (ScsiTrackDescriptor *)param4);
+			return ENOSYS;
+			//return sys_storage_ext_mount_ps2_discfile(param1, (char **)param2, param3, (ScsiTrackDescriptor *)param4);
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_DISCFILE_PROXY:
