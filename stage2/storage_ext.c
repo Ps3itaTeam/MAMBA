@@ -1222,14 +1222,14 @@ void process_disc_insert(uint32_t disctype)
 			{
 				fake_disctype = effective_disctype = DEVICE_TYPE_PS2_CD;
 			}
-		break; */
+		break;
 
 		case EMU_PS2_DVD:
 			if (real_disctype != DEVICE_TYPE_PS2_DVD)
 			{
 				fake_disctype = effective_disctype = DEVICE_TYPE_PS2_DVD;
 			}
-		break;
+		break; */
 
 		case EMU_OFF:
 			/* if (real_disctype == DEVICE_TYPE_CD)
