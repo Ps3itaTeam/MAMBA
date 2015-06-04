@@ -2716,7 +2716,7 @@
 #define cellFsStat_symbol                           0x29711C // bytes matched: 0x18  F821FF617C0802A6FB610078FBA10088FBC100907C7D1B78
 #define cellFsUnlink_internal_symbol                0x19C64C // bytes matched: 0x80  F821FEF17C0802A62C240000FBE101083FE08001FB8100F0FBA100F8FBC10100
 #define cellFsUtilMount_symbol                      0x296C78 // bytes matched: 0x1C  F821FED17C0802A6FBA101183BA10080FAE100E8FBC101207C972378
-#define cellFsUtilUmount_symbol                     0x296C00 // bytes matched: 0x20**  7C8023787CA62B787C641B787C05037838E00000E93E80B0EBC1FFF0E8690000
+#define cellFsUtilUmount_symbol 					0x296C4C //old: 0x296C00
 #define pathdup_from_user_symbol                    0x29C8E4 // bytes matched: 0x18  F821FF517C0802A6FB210078FB410080FBC100A07C7A1B78
 #define open_path_symbol                            0x297638 // bytes matched: 0x28  F821FF617C0802A6FB810080FBA10088FBE10098FB410070FB610078F80100B0
 #define open_fs_object_symbol                       0x18A970 // bytes matched: 0x58  7D800026F821FF31FBC100C0EBC2FD98FB010090FB210098FB4100A0FB6100A8
