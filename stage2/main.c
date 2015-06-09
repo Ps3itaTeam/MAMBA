@@ -173,6 +173,8 @@ LV2_HOOKED_FUNCTION(void *, sys_cfw_memcpy, (void *dst, void *src, uint64_t len)
 	return memcpy(dst, src, len);
 }
 
+static uint8_t isLoadedFromIrisManager = 0;
+
 int64_t syscall8(uint64_t function, uint64_t param1, uint64_t param2, uint64_t param3, uint64_t param4, uint64_t param5, uint64_t param6, uint64_t param7);
 f_desc_t extended_syscall8;
 static void *current_813;
@@ -203,13 +205,16 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 					#ifdef DEBUG
 					DPRINTF("Removing syscall 8 extension\n");
 					#endif
-
-					extended_syscall8.addr = 0;
+					if (isLoadedFromIrisManager == 0)
+						extended_syscall8.addr = 0;
 					return;
 				}				
 				
 				extended_syscall8.addr = (void *) *(uint64_t *)value;
-				extended_syscall8.toc = (void *) *(uint64_t *)(value+8);
+				if (isLoadedFromIrisManager == 0)
+					extended_syscall8.toc = (void *) *(uint64_t *)(value+8);
+				else
+					extended_syscall8.toc = (void *) *(uint64_t *)(MKA(0x3000));
 			
 				#ifdef DEBUG
 				DPRINTF("Adding syscall 8 extension %p %p\n", extended_syscall8.addr, extended_syscall8.toc);
@@ -760,7 +765,7 @@ static INLINE void apply_kernel_patches(void)
 //MAIN
 //----------------------------------------
 
-uint8_t mamba_loaded = 0;
+static uint8_t mamba_loaded = 0;
 
 int main(void)
 {
@@ -781,7 +786,7 @@ int main(void)
 	apply_kernel_patches();	
 	#endif
 	map_path_patches(1);
-	if ((storage_ext_patches_done == 0)  && (vsh_process) ) storage_ext_patches();
+	storage_ext_patches();
     region_patches();	
 	
 	//Check if Iris (sky) payload is loaded
@@ -789,6 +794,7 @@ int main(void)
 	uint64_t sys8_id = *((uint64_t *)MKA(0x4f0));
 	if((sys8_id>>32) == 0x534B3145) //SK10 HEADER
 	{
+		isLoadedFromIrisManager = 1;
 		sys8_id&= 0xffffffffULL;
 		extended_syscall8.addr = (void *) *((uint64_t *)MKA(0x8000000000000000ULL + (sys8_id + 0x20ULL)));
 		extended_syscall8.toc = (void *) *(uint64_t *)(MKA(0x3000));
@@ -796,7 +802,7 @@ int main(void)
 		uint64_t syscall_not_impl = *(uint64_t *)MKA(syscall_table_symbol);
 		*(uint64_t *)MKA(syscall_table_symbol+ ( 8* 40)) = syscall_not_impl;
 	}
-	
+
     create_syscall2(8, syscall8);
 	create_syscall2(6, sys_cfw_peek);
     create_syscall2(7, sys_cfw_poke);
@@ -805,6 +811,9 @@ int main(void)
 	create_syscall2(11, sys_cfw_lv1_peek);
 
 	//map_path("/app_home", "/dev_usb000", 0);
+
+	//CellFsStat stat;
+	//if (cellFsStat("/dev_hdd0", &stat) == 0) read_mamba_config();
 
     return 0;
 }

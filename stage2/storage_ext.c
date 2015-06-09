@@ -2469,14 +2469,38 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, emu_disc_auth, (uint64_t func, uint64_t
 	return DO_POSTCALL;
 }
 
-#ifdef DEBUG
+static uint8_t hdd0_mounted = 0;
+
 LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *block_dev, const char *filesystem, const char *mount_point, int unk, int read_only, int unk2, char *argv[], int argc))
 {
-	DPRINTF("cellFsUtilMount: %s\n", mount_point);
-	
+	#ifdef DEBUG
+		DPRINTF("cellFsUtilMount: %s\n", mount_point);
+	#endif
+	if (!hdd0_mounted && strcmp(mount_point, "/dev_hdd0") == 0 && strcmp(filesystem, "CELL_FS_UFS") == 0)
+	{
+		hdd0_mounted = 1;
+		read_mamba_config();
+		mutex_lock(mutex, 0);
+		if (real_disctype == 0)
+		{
+			unsigned int disctype = get_disc_type();
+
+			if (disctype == DEVICE_TYPE_CD || disctype == DEVICE_TYPE_DVD)
+			{
+				fake_reinsert(disctype);
+			}
+			else if (disctype != 0)
+			{
+				process_disc_insert(disctype);
+			}
+		}
+		mutex_unlock(mutex);
+		#ifndef DEBUG
+			unhook_function_on_precall_success(cellFsUtilMount_symbol, post_cellFsUtilMount, 8);
+		#endif
+	}
 	return 0;
 }
-#endif
 
 static INLINE void do_umount_discfile(void)
 {
@@ -3278,12 +3302,13 @@ void storage_ext_init(void)
 	ppu_thread_create(&dispatch_thread, dispatch_thread_entry, 0, -0x1D8, 0x4000, 0, THREAD_NAME);
 }
 
-uint8_t storage_ext_patches_done = 0;
+
+uint8_t storage_ext_patches_done;
 
 void storage_ext_patches(void)
 {
-	if (storage_ext_patches_done == 1) return;
-	storage_ext_patches_done = 1;
+	if(storage_ext_patches_done == 1) return;
+    storage_ext_patches_done = 1;
 	patch_jump(device_event_port_send_call, device_event);
 	hook_function_on_precall_success(storage_get_device_info_symbol, post_storage_get_device_info, 2);
 	// read_bdvd0 is the base function called by read_bdvd1 and read_bdvd2.
@@ -3300,29 +3325,7 @@ void storage_ext_patches(void)
 	// SS function
 	hook_function_with_cond_postcall(get_syscall_address(864), emu_disc_auth, 2);
 	// Initial setup
-	#ifdef DEBUG
 	hook_function_on_precall_success(cellFsUtilMount_symbol, post_cellFsUtilMount, 8);
-	#endif
-	CellFsStat stat;
-	if (cellFsStat("/dev_hdd0", &stat) == 0)
-	{
-		read_mamba_config();
-		mutex_lock(mutex, 0);
-		if (real_disctype == 0)
-		{
-			unsigned int disctype = get_disc_type();
-
-			if (disctype == DEVICE_TYPE_CD || disctype == DEVICE_TYPE_DVD)
-			{
-				fake_reinsert(disctype);
-			}
-			else if (disctype != 0)
-			{
-				process_disc_insert(disctype);
-			}
-		}
-		mutex_unlock(mutex);
-	}	
 	// For encrypted fsloop images
 	patch_call(fsloop_open_call, fsloop_open);
 	patch_call(fsloop_close_call, fsloop_close);
@@ -3344,6 +3347,9 @@ void unhook_all_storage_ext(void)
 	unhook_function_with_cond_postcall(get_syscall_address(864), emu_disc_auth, 2);
 	#ifdef DEBUG
 	unhook_function_on_precall_success(cellFsUtilMount_symbol, post_cellFsUtilMount, 8);
+	#else
+	if (!hdd0_mounted)
+		unhook_function_on_precall_success(cellFsUtilMount_symbol, post_cellFsUtilMount, 8);
 	#endif
 	resume_intr();
 }
