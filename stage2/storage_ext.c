@@ -3180,10 +3180,10 @@ int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event
 		{
 			discfile_proxy = alloc(sizeof(DiscFileProxy) + (trackscount * sizeof(ScsiTrackDescriptor)), 0x27);
 		}
-		else */
-		{
+		else 
+		{*/
 			discfile_proxy = alloc(sizeof(DiscFileProxy), 0x27);
-		}
+		//}
 
 		discfile_proxy->size = disc_size_bytes;
 		discfile_proxy->read_size = read_size;
@@ -3196,11 +3196,11 @@ int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event
 			discfile_proxy->tracks = (ScsiTrackDescriptor *)(discfile_proxy+1);
 			copy_from_user(tracks, discfile_proxy->tracks, sizeof(ScsiTrackDescriptor)*trackscount);
 		}
-		else */
-		{
+		else 
+		{*/
 			discfile_proxy->numtracks = 0;
 			discfile_proxy->tracks = NULL;
-		}
+		//}
 
 		disc_emulation = emu_type;
 		total_emulation = (!disc_being_mounted && real_disctype == 0);
@@ -3307,7 +3307,7 @@ void storage_ext_patches(void)
 	if (cellFsStat("/dev_hdd0", &stat) == 0)
 	{
 		read_mamba_config();
-		/* mutex_lock(mutex, 0);
+		mutex_lock(mutex, 0);
 		if (real_disctype == 0)
 		{
 			unsigned int disctype = get_disc_type();
@@ -3321,7 +3321,7 @@ void storage_ext_patches(void)
 				process_disc_insert(disctype);
 			}
 		}
-		mutex_unlock(mutex); */
+		mutex_unlock(mutex);
 	}	
 	// For encrypted fsloop images
 	patch_call(fsloop_open_call, fsloop_open);
