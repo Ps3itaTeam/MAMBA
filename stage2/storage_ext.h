@@ -10,9 +10,9 @@ enum EMU_TYPE
 {
 	EMU_OFF = 0,
 	EMU_PS3,
-	//EMU_PS2_DVD,
-	//EMU_PS2_CD,
-	//EMU_PSX,
+	EMU_PS2_DVD,
+	EMU_PS2_CD,
+	EMU_PSX,
 	EMU_BD,
 	EMU_DVD,
 	EMU_MAX,
