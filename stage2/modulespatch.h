@@ -132,6 +132,16 @@
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
+#elif defined(FIRMWARE_4_75DEX)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
+#elif defined(FIRMWARE_4_76)
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define aio_copy_root_offset		0xD658
+
 #endif /* FIRMWARE */
 
 extern uint8_t condition_apphome; //needed libfs patch (JB FORMAT GAME)
