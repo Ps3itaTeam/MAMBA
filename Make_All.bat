@@ -40,6 +40,7 @@ if exist mamba_4_53DEX.lz.bin  move  mamba_4_53DEX.lz.bin  mamba\mamba_453D.lz.b
 if exist mamba_4_55.lz.bin     move  mamba_4_55.lz.bin     mamba\mamba_455C.lz.bin>nul
 if exist mamba_4_55DEX.lz.bin  move  mamba_4_55DEX.lz.bin  mamba\mamba_455D.lz.bin>nul
 if exist mamba_4_60.lz.bin     move  mamba_4_60.lz.bin     mamba\mamba_460C.lz.bin>nul
+if exist mamba_4_60DEX.lz.bin  move  mamba_4_60DEX.lz.bin  mamba\mamba_460D.lz.bin>nul
 if exist mamba_4_65.lz.bin     move  mamba_4_65.lz.bin     mamba\mamba_465C.lz.bin>nul
 if exist mamba_4_65DEX.lz.bin  move  mamba_4_65DEX.lz.bin  mamba\mamba_465D.lz.bin>nul
 if exist mamba_4_66.lz.bin     move  mamba_4_66.lz.bin     mamba\mamba_466C.lz.bin>nul
@@ -49,6 +50,7 @@ if exist mamba_4_70DEX.lz.bin  move  mamba_4_70DEX.lz.bin  mamba\mamba_470D.lz.b
 if exist mamba_4_75.lz.bin     move  mamba_4_75.lz.bin     mamba\mamba_475C.lz.bin>nul
 if exist mamba_4_75DEX.lz.bin  move  mamba_4_75DEX.lz.bin  mamba\mamba_475D.lz.bin>nul
 if exist mamba_4_76.lz.bin     move  mamba_4_76.lz.bin     mamba\mamba_476C.lz.bin>nul
+if exist mamba_4_76DEX.lz.bin  move  mamba_4_76DEX.lz.bin  mamba\mamba_476D.lz.bin>nul
 
 if not exist mamba\bin mkdir mamba\bin
 
@@ -71,6 +73,7 @@ if exist mamba_4_53DEX.bin  move  mamba_4_53DEX.bin  mamba\bin\mamba_453D.bin>nu
 if exist mamba_4_55.bin     move  mamba_4_55.bin     mamba\bin\mamba_455C.bin>nul
 if exist mamba_4_55DEX.bin  move  mamba_4_55DEX.bin  mamba\bin\mamba_455D.bin>nul
 if exist mamba_4_60.bin     move  mamba_4_60.bin     mamba\bin\mamba_460C.bin>nul
+if exist mamba_4_60DEX.bin  move  mamba_4_60DEX.bin  mamba\bin\mamba_460D.bin>nul
 if exist mamba_4_65.bin     move  mamba_4_65.bin     mamba\bin\mamba_465C.bin>nul
 if exist mamba_4_65DEX.bin  move  mamba_4_65DEX.bin  mamba\bin\mamba_465D.bin>nul
 if exist mamba_4_66.bin     move  mamba_4_66.bin     mamba\bin\mamba_466C.bin>nul
@@ -80,6 +83,7 @@ if exist mamba_4_70DEX.bin  move  mamba_4_70DEX.bin  mamba\bin\mamba_470D.bin>nu
 if exist mamba_4_75.bin     move  mamba_4_75.bin  	 mamba\bin\mamba_475C.bin>nul
 if exist mamba_4_75DEX.bin  move  mamba_4_75DEX.bin  mamba\bin\mamba_475D.bin>nul
 if exist mamba_4_76.bin     move  mamba_4_76.bin  	 mamba\bin\mamba_476C.bin>nul
+if exist mamba_4_76DEX.bin  move  mamba_4_76DEX.bin  mamba\bin\mamba_476D.bin>nul
 del *.bin>nul
 
 pause

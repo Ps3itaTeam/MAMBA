@@ -211,6 +211,16 @@
 	#else
 		#define PS3MAPI_FW_TYPE			 		"CEX COBRA"
 	#endif
+#elif defined(FIRMWARE_4_60DEX)
+	#define PS3MAPI_FW_VERSION			 		0x0460
+	#define PS3MAPI_IDPS_1			 			0x80000000004095B0ULL
+	#define PS3MAPI_IDPS_2			 			0x800000000049CF1CULL
+	#define PS3MAPI_PSID						0x800000000049CF34ULL
+	#if defined(IS_MAMBA)
+		#define PS3MAPI_FW_TYPE			 		"DEX MAMBA"
+	#else
+		#define PS3MAPI_FW_TYPE			 		"DEX COBRA"
+	#endif
 #elif defined(FIRMWARE_4_65)
 	#define PS3MAPI_FW_VERSION			 		0x0465
 	#define PS3MAPI_IDPS_1			 			0x80000000003E2BB0ULL
@@ -300,6 +310,16 @@
 		#define PS3MAPI_FW_TYPE			 		"CEX MAMBA"
 	#else
 		#define PS3MAPI_FW_TYPE			 		"CEX COBRA"
+	#endif
+#elif defined(FIRMWARE_4_76DEX)
+	#define PS3MAPI_FW_VERSION			 		0x0476
+	#define PS3MAPI_IDPS_1			 			0x8000000000409930ULL
+	#define PS3MAPI_IDPS_2			 			0x800000000049CAF4ULL
+	#define PS3MAPI_PSID						0x800000000049CB0CULL
+	#if defined(IS_MAMBA)
+		#define PS3MAPI_FW_TYPE			 		"DEX MAMBA"
+	#else
+		#define PS3MAPI_FW_TYPE			 		"DEX COBRA"
 	#endif
 #endif
 

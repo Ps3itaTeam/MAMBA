@@ -4,61 +4,95 @@
 #undef  printf
 
 #if defined(FIRMWARE_3_55)
-#define FIRMWARE_VERSION					0x0355
+	#define FIRMWARE_VERSION					0x0355
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_3_55DEX)
-#define FIRMWARE_VERSION					0x0355
+	#define FIRMWARE_VERSION					0x0355
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_21)
-#define FIRMWARE_VERSION					0x0421
+	#define FIRMWARE_VERSION					0x0421
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_21DEX)
-#define FIRMWARE_VERSION					0x0421
+	#define FIRMWARE_VERSION					0x0421
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_30)
-#define FIRMWARE_VERSION					0x0430
+	#define FIRMWARE_VERSION					0x0430
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_30DEX)
-#define FIRMWARE_VERSION					0x0430
+	#define FIRMWARE_VERSION					0x0430
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_31)
-#define FIRMWARE_VERSION					0x0431
+	#define FIRMWARE_VERSION					0x0431
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_40)
-#define FIRMWARE_VERSION					0x0440
+	#define FIRMWARE_VERSION					0x0440
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_41)
-#define FIRMWARE_VERSION					0x0441
+	#define FIRMWARE_VERSION					0x0441
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_41DEX)
-#define FIRMWARE_VERSION					0x0441
+	#define FIRMWARE_VERSION					0x0441
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_46)
-#define FIRMWARE_VERSION					0x0446
+	#define FIRMWARE_VERSION					0x0446
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_46DEX)
-#define FIRMWARE_VERSION					0x0446
+	#define FIRMWARE_VERSION					0x0446
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_50)
-#define FIRMWARE_VERSION					0x0450
+	#define FIRMWARE_VERSION					0x0450
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_50DEX)
-#define FIRMWARE_VERSION					0x0450
+	#define FIRMWARE_VERSION					0x0450
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_53)
-#define FIRMWARE_VERSION					0x0453
+	#define FIRMWARE_VERSION					0x0453
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_53DEX)
-#define FIRMWARE_VERSION					0x0453
+	#define FIRMWARE_VERSION					0x0453
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_55)
-#define FIRMWARE_VERSION					0x0455
+	#define FIRMWARE_VERSION					0x0455
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_55DEX)
-#define FIRMWARE_VERSION					0x0455
+	#define FIRMWARE_VERSION					0x0455
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_60)
-#define FIRMWARE_VERSION					0x0460
+	#define FIRMWARE_VERSION					0x0460
+	#define IS_DEX_FIRMWARE						0
+#elif defined(FIRMWARE_4_60DEX)
+	#define FIRMWARE_VERSION					0x0460
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_65)
-#define FIRMWARE_VERSION					0x0465
+	#define FIRMWARE_VERSION					0x0465
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_65DEX)
-#define FIRMWARE_VERSION					0x0465
+	#define FIRMWARE_VERSION					0x0465
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_66)
-#define FIRMWARE_VERSION					0x0466
+	#define FIRMWARE_VERSION					0x0466
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_66DEX)
-#define FIRMWARE_VERSION					0x0466
+	#define FIRMWARE_VERSION					0x0466
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_70)
-#define FIRMWARE_VERSION					0x0470
+	#define FIRMWARE_VERSION					0x0470
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_70DEX)
-#define FIRMWARE_VERSION					0x0470
+	#define FIRMWARE_VERSION					0x0470
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_75)
-#define FIRMWARE_VERSION					0x0475
+	#define FIRMWARE_VERSION					0x0475
+	#define IS_DEX_FIRMWARE						0
 #elif defined(FIRMWARE_4_75DEX)
-#define FIRMWARE_VERSION					0x0475
+	#define FIRMWARE_VERSION					0x0475
+	#define IS_DEX_FIRMWARE						1
 #elif defined(FIRMWARE_4_76)
-#define FIRMWARE_VERSION					0x0476
+	#define FIRMWARE_VERSION					0x0476
+	#define IS_DEX_FIRMWARE						0
+#elif defined(FIRMWARE_4_76DEX)
+	#define FIRMWARE_VERSION					0x0476
+	#define IS_DEX_FIRMWARE						1
 #endif
 
 

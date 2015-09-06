@@ -2020,7 +2020,6 @@
 #define patch_func2_offset                          0x2C
 #define user_thread_prio_patch                          0x203F8 // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
 #define user_thread_prio_patch2                         0x20404 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
-
 #elif defined(FIRMWARE_4_60DEX)
 #define TOC                                         0x375500 //done
 #define open_shared_kernel_object_symbol            0x12A54 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -3076,5 +3075,109 @@
 #define patch_func2_offset 				0x2C 
 #define user_thread_prio_patch				0x203FC // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
 #define user_thread_prio_patch2				0x20408 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
+#elif defined(FIRMWARE_4_76DEX) // Ported by Joonie, special thanks to @aldostools for his awesome Getsymbol tool!!!!
+#define TOC						0x3758E0 //Verified with IDA by Joonie
+#define open_shared_kernel_object_symbol		0x12A58 // Verified with IDA by Joonie
+#define close_kernel_object_handle_symbol		0x12078 // Verified with IDA by Joonie
+#define alloc_symbol					0x681F4 // Verified with IDA by Joonie
+#define dealloc_symbol					0x68630 // Verified with IDA by Joonie
+#define copy_to_user_symbol				0xFEB4 // Verified with IDA by Joonie
+#define copy_from_user_symbol				0x100D0 //Verified with IDA by Joonie
+#define copy_to_process_symbol				0xFF6C // Verified with IDA by Joonie
+#define copy_from_process_symbol			0xFD7C // Verified with IDA by Joonie
+#define page_allocate_symbol				0x63D64 // Verified with IDA by Joonie
+#define page_free_symbol				0x637C8 // Verified with IDA by Joonie
+#define page_export_to_proc_symbol			0x63F00 // Verified with IDA by Joonie
+#define page_unexport_from_proc_symbol			0x636BC // Verified with IDA by Joonie
+#define kernel_ea_to_lpar_addr_symbol			0x73C9C // Verified with IDA by Joonie
+#define map_process_memory_symbol			0x7B348 // Verified with IDA by Joonie
+#define memcpy_symbol					0x82A08 // Verified with IDA by Joonie
+#define memset_symbol					0x51014 // Verified with IDA by Joonie
+#define memcmp_symbol					0x50324 // Verified with IDA by Joonie
+#define sprintf_symbol					0x5243C // Verified with IDA by Joonie
+#define snprintf_symbol					0x523A8 // Verified with IDA by Joonie
+#define strcpy_symbol					0x511C0 // Verified with IDA by Joonie
+#define strncpy_symbol					0x51288 // Verified with IDA by Joonie
+#define strlen_symbol					0x511E8 // Verified with IDA by Joonie
+#define strcat_symbol					0x510F0 // Verified with IDA by Joonie
+#define strcmp_symbol					0x5116C // Verified with IDA by Joonie
+#define strncmp_symbol					0x51214 // Verified with IDA by Joonie
+#define strchr_symbol					0x51128 // Verified with IDA by Joonie
+#define spin_lock_irqsave_ex_symbol			0x275670 // Verified with IDA by Joonie
+#define spin_unlock_irqrestore_ex_symbol		0x275644 // Verified with IDA by Joonie
+#define load_process_symbol				0x5004 // Verified with IDA by Joonie
+#define ppu_thread_create_symbol			0x145FC // Verified with IDA by Joonie
+#define ppu_thread_exit_symbol                          0x146B4 // Verified with IDA by Joonie
+#define ppu_thread_join_symbol				0x14708 // Verified with IDA by Joonie
+#define ppu_thread_delay_symbol				0x2A6E8 // Verified with IDA by Joonie
+#define create_user_thread2_symbol			0x26D30 // Verified with IDA by Joonie
+#define start_thread_symbol				0x25868 // Verified with IDA by Joonie
+#define run_thread_symbol				0x2502C // Verified with IDA by Joonie
+#define register_thread_symbol				0x26E270 // Verified with IDA by Joonie
+#define allocate_user_stack_symbol			0x26EA58 // Verified with IDA by Joonie
+#define mutex_create_symbol				0x13C8C // Verified with IDA by Joonie
+#define mutex_destroy_symbol                            0x13C24 // Verified with IDA by Joonie
+#define mutex_lock_symbol				0x13C1C // Verified with IDA by Joonie
+#define mutex_unlock_symbol                             0x13C14 // Verified with IDA by Joonie
+#define event_port_create_symbol			0x136C8 //  Verified with IDA by Joonie
+#define event_port_destroy_symbol                       0x13B30 // Verified with IDA by Joonie
+#define event_port_connect_symbol			0x13BA8 // Verified with IDA by Joonie
+#define event_port_disconnect_symbol			0x13AD4 // Verified with IDA by Joonie
+#define event_port_send_symbol				0x136C0 // Verified with IDA by Joonie
+#define event_queue_create_symbol			0x139D0 // Verified with IDA by Joonie
+#define event_queue_destroy_symbol                      0x13958 // Verified with IDA by Joonie
+#define event_queue_receive_symbol			0x1379C // Verified with IDA by Joonie
+#define cellFsOpen_symbol				0x2B27C0 // Verified with IDA by Joonie
+#define cellFsClose_symbol                              0x2B2628 // Verified with IDA by Joonie
+#define cellFsRead_symbol				0x2B2764 // Verified with IDA by Joonie
+#define cellFsWrite_symbol				0x2B26D0 // Verified with IDA by Joonie
+#define cellFsLseek_symbol				0x2B1F24 // Verified with IDA by Joonie
+#define cellFsStat_symbol				0x2B1FDC // Verified with IDA by Joonie
+#define cellFsUnlink_internal_symbol			0x1A29D8 // Verified with IDA by Joonie
+#define cellFsUtilMount_symbol				0x2B1C98 // Verified with IDA by Joonie
+#define cellFsUtilUmount_symbol				0x2B1C6C // Verified with IDA by Joonie
+#define pathdup_from_user_symbol			0x2B7A84 // Verified with IDA by Joonie
+#define open_path_symbol                                0x2B24F8 // Verified with IDA by Joonie
+#define open_fs_object_symbol                           0x190CFC // Verified with IDA by Joonie
+#define close_fs_object_symbol				0x18FC38 // Verified with IDA by Joonie
+#define storage_get_device_info_symbol			0x28CA00 // Verified with IDA by Joonie
+#define storage_open_symbol                             0x28CC28 // Verified with IDA by Joonie
+#define storage_close_symbol                            0x28B414 // Verified with IDA by Joonie
+#define storage_read_symbol                             0x28A390 // Verified with IDA by Joonie
+#define storage_send_device_command_symbol              0x289EB0 // Verified with IDA by Joonie
+#define storage_map_io_memory_symbol                    0x28C8AC // Verified with IDA by Joonie
+#define storage_unmap_io_memory_symbol                  0x28C768 // Verified with IDA by Joonie
+#define storage_internal_get_device_object_symbol       0x289968 // Verified with IDA by Joonie
+#define decrypt_func_symbol				0x38290 // Verified with IDA by Joonie
+#define lv1_call_99_wrapper_symbol			0x52850 // Verified with IDA by Joonie
+#define modules_verification_symbol			0x5C488 // Verified with IDA by Joonie
+#define prx_load_module_symbol				0x8D308 // Verified with IDA by Joonie
+#define prx_start_module_symbol				0x8BFD4 // Verified with IDA by Joonie
+#define prx_stop_module_symbol				0x8D3AC // Verified with IDA by Joonie
+#define prx_unload_module_symbol			0x8BD08 // Verified with IDA by Joonie
+#define prx_get_module_info_symbol			0x8B700 // Verified with IDA by Joonie
+#define prx_get_module_list_symbol			0x8B780 // Verified with IDA by Joonie
+#define extend_kstack_symbol				0x73BF4 // Verified with IDA by Joonie
+#define get_pseudo_random_number_symbol                 0x22E65C // Verified with IDA by Joonie
+#define syscall_table_symbol				0x38A3E8 //Verified with IDA by Joonie
+#define syscall_call_offset				0x27DEE4 // Verified with IDA by Joonie
+#define read_bdvd0_symbol				0x1AAACC // Verified with IDA by Joonie
+#define read_bdvd1_symbol				0x1AC6F8 // Verified with IDA by Joonie
+#define read_bdvd2_symbol				0x1B98B0 // Verified with IDA by Joonie
+#define device_event_port_send_call			0x296BFC // Verified with IDA by Joonie
+#define process_map_caller_call				0x4D24 // Verified with IDA by Joonie
+#define fsloop_open_call				0x2B2958 // Verified with IDA by Joonie
+#define fsloop_close_call				0x2B29A8 // Verified with IDA by Joonie
+#define fsloop_read_call				0x2B29E8 // Verified with IDA by Joonie
+#define io_rtoc_entry_1					0x2EC0 // FIXED!
+#define io_sub_rtoc_entry_1				-0x7EA0 //found at 0x16AF13 8160E97E8168EB9E8140EBBE8170
+#define decrypt_rtoc_entry_2 				-0x65C0 //found at 0x5D283 9A404BFFBC25392000004BFFFFCC2C2400007C0802A6
+#define storage_rtoc_entry_1				0x22B0 //found at 0x289BF3 22B07C0802A6F821FF51F80100C0FBE100A87C9F23
+#define device_event_rtoc_entry_1			0x2638 //found at 0x296BE7 263878050620E8CA00387D052B78E92B0000
+#define process_rtoc_entry_1				-0x77A0 //found at 0x1BC07 88603FC0800163DE0005E87D0000
+#define patch_func2 					0x5D754 // Verified with IDA by Joonie
+#define patch_func2_offset 				0x2C
+#define user_thread_prio_patch				0x21EAC // Verified with IDA by Joonie
+#define user_thread_prio_patch2				0x21EB8 // Verified with IDA by Joonie 
 #endif /* FIRMWARE */
 #endif /* __FIRMWARE_SYMBOLS_H_S__ */
