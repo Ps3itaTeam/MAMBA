@@ -7,30 +7,37 @@
 // BIG WARNING: self offsets need to add 0x10000 for address shown in IDA, but not sprxs!
 
 #if defined(FIRMWARE_3_55)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bad800005fa4
 #define aio_copy_root_offset		0xD37C
 
 #elif defined(FIRMWARE_3_55DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bad800005fa4
 #define aio_copy_root_offset		0xD37C
 
 #elif defined(FIRMWARE_4_21)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_21DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_30)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_30DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_31)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
 #define aio_copy_root_offset		0xD5B4
 
@@ -40,18 +47,22 @@
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_41)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_41DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006430
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_46)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006433
 #define aio_copy_root_offset		0xD5B4
 
 #elif defined(FIRMWARE_4_46DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bec800006433
 #define aio_copy_root_offset		0xD5B4
 
@@ -64,6 +75,7 @@
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_53)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
@@ -72,6 +84,7 @@
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_55)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
@@ -80,50 +93,52 @@
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_60)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_60DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_65)
-#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477 
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
- 
+
 #elif defined(FIRMWARE_4_65DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_66)
-#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477 
+
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_66DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_70)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_70DEX)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_75)
+
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 
 #elif defined(FIRMWARE_4_75DEX)
-#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
-#define aio_copy_root_offset		0xD658
 
-#elif defined(FIRMWARE_4_76)
-#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
-#define aio_copy_root_offset		0xD658
-
-#elif defined(FIRMWARE_4_76DEX)
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define aio_copy_root_offset		0xD658
 

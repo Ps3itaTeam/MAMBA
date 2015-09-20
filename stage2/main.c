@@ -1,7 +1,7 @@
 /*
  'Mamba' is the payload version of Cobra code CFW (developed by Cobra Team) for Iris Manager
  and updated by NzV to work without Iris (sky) payload (also autoboot features)
- 
+
  LICENSED under GPL v3.0
 
 */
@@ -90,7 +90,7 @@ LV2_SYSCALL2(uint64_t, sys_cfw_lv1_peek, (uint64_t lv1_addr))
 	#endif
 
     uint64_t ret;
-    ret = lv1_peekd(lv1_addr); 
+    ret = lv1_peekd(lv1_addr);
     return ret;
 
 }
@@ -100,7 +100,7 @@ LV2_SYSCALL2(void, sys_cfw_lv1_poke, (uint64_t lv1_addr, uint64_t lv1_value))
 	#ifdef DEBUG
 	DPRINTF("poke %016lx %016lx\n", lv1_addr, lv1_value);
 	#endif
-	
+
 	lv1_poked(lv1_addr, lv1_value);
 }
 
@@ -127,13 +127,13 @@ LV2_SYSCALL2(uint64_t, sys_cfw_peek, (uint64_t *addr))
 	#endif
 
 	uint64_t ret = *addr;
-		
+
 	// Fix compatibilty issue with prx loader (before v1.08 [U]). It searches for a string... that is also in this payload, and then lv2_peek((vsh_str + 0x70)) crashes the system.
 	if (ret == 0x5F6D61696E5F7673)
 	{
 		extern uint64_t _start;
 		extern uint64_t __self_end;
-		
+
 		if ((uint64_t)addr >= (uint64_t)&_start && (uint64_t)addr < (uint64_t)&__self_end)
 		{
 			#ifdef DEBUG
@@ -142,7 +142,7 @@ LV2_SYSCALL2(uint64_t, sys_cfw_peek, (uint64_t *addr))
 			return 0;
 		}
 	}
-		
+
 	return ret;
 }
 
@@ -153,7 +153,7 @@ LV2_HOOKED_FUNCTION(void, sys_cfw_new_poke, (uint64_t *addr, uint64_t value))
 	#ifdef DEBUG
 	DPRINTF("New poke called\n");
 	#endif
-	
+
 	_sys_cfw_poke(addr, value);
 	asm volatile("icbi 0,%0; isync" :: "r"(addr));
 }
@@ -163,7 +163,7 @@ LV2_HOOKED_FUNCTION(void *, sys_cfw_memcpy, (void *dst, void *src, uint64_t len)
 	#ifdef DEBUG
 	DPRINTF("sys_cfw_memcpy: %p %p 0x%lx\n", dst, src, len);
 	#endif
-	
+
 	if (len == 8)
 	{
 		_sys_cfw_poke(dst, *(uint64_t *)src);
@@ -182,16 +182,16 @@ static void *current_813;
 LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 {
 	uint64_t addr = (uint64_t)ptr;
-	
+
 	#ifdef DEBUG
 	DPRINTF("poke %016lx %016lx\n", addr, value);
 	#endif
-		
+
 	if (addr >= MKA(syscall_table_symbol))
 	{
 		uint64_t syscall_num = (addr-MKA(syscall_table_symbol)) / 8;
-		
-		if ((syscall_num >= 6 && syscall_num <= 10) || syscall_num == 35)//Rewrite protection
+
+		if ((syscall_num >= 6 && syscall_num <= 11) || syscall_num == 35)//Rewrite protection
 		{
 			uint64_t sc_null = *(uint64_t *)MKA(syscall_table_symbol);
 			uint64_t syscall_not_impl = *(uint64_t *)sc_null;
@@ -208,18 +208,18 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 					if (isLoadedFromIrisManager == 0)
 						extended_syscall8.addr = 0;
 					return;
-				}				
-				
+				}
+
 				extended_syscall8.addr = (void *) *(uint64_t *)value;
 				if (isLoadedFromIrisManager == 0)
 					extended_syscall8.toc = (void *) *(uint64_t *)(value+8);
 				else
 					extended_syscall8.toc = (void *) *(uint64_t *)(MKA(0x3000));
-			
+
 				#ifdef DEBUG
 				DPRINTF("Adding syscall 8 extension %p %p\n", extended_syscall8.addr, extended_syscall8.toc);
 				#endif
-				
+
 				return;
 			}
 			else if (((value == sc_null) ||(value == syscall_not_impl)) && (syscall_num != 8)) //Allow remove protected syscall 6 7 9 10 11 35 NOT 8
@@ -235,7 +235,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 				#endif
 				return;
 			}
-		}		
+		}
 	}
 	else if (addr == MKA(open_path_symbol))
 	{
@@ -243,7 +243,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 		#ifdef DEBUG
 		DPRINTF("open_path poke: %016lx\n", value);
 		#endif
-		
+
 		if (value == 0xf821ff617c0802a6ULL)
 		{
 			#ifdef DEBUG
@@ -253,7 +253,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 			clear_icache(ptr, 8);
 			map_path_patches(0);
 			return;
-		}		
+		}
 	}
 	else
 	{
@@ -269,7 +269,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 				#ifdef DEBUG
 				DPRINTF("Making sys_cfw_new_poke\n");
 				#endif
-				
+
 				if (current_813)
 				{
 					unhook_function(sc813, current_813);
@@ -283,7 +283,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 			{
 				// Assume app is trying to write a memcpy
 				f_desc_t f;
-				
+
 				#ifdef DEBUG
 				DPRINTF("Making sys_cfw_memcpy\n");
 				#endif
@@ -304,7 +304,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 					#ifdef DEBUG
 					DPRINTF("Restoring syscall 813\n");
 					#endif
-					
+
 					unhook_function(sc813, current_813);
 					current_813 = NULL;
 					return;
@@ -355,22 +355,35 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	uint32_t pid;
 
 	extend_kstack(0);
-	
+
 	#ifdef DEBUG
 	DPRINTF("Syscall 8 -> %lx\n", function);
 	#endif
-	
+
+	// -- AV: temporary disable cobra syscall (allow dumpers peek 0x1000 to 0xA000)
+	static uint8_t tmp_lv1peek = 0;
+
+	if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
+	{
+		if((function >= 0xA000) || (function & 3)) tmp_lv1peek=0; else
+		if(function <= 0x1000) tmp_lv1peek=1;
+
+		if(tmp_lv1peek) {return lv1_peekd(function);}
+	}
+	else tmp_lv1peek=0;
+	// --
+
 	// Some processsing to avoid crashes with lv1 dumpers
 	pid = get_current_process_critical()->pid;
 
 	if (pid == pid_blocked)
 	{
-		if (function >= 0xA000 || (function & 3)) /* Keep all cobra opcodes below 0xA000 */
+		if (function <= 0x1000 ||function >= 0xA000 || (function & 3)) /* Keep all cobra opcodes below 0xA000 */
 		{
 			#ifdef ENABLE_LOG
 			WriteToLog("App was unblocked from using syscall8\n");
 			#endif
-			
+
 			#ifdef DEBUG
 			DPRINTF("App was unblocked from using syscall8\n");
 			#endif
@@ -382,7 +395,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			sprintf(buffer_log, "App was blocked from using syscall8\n");
 			WriteToLog(buffer_log);
 			#endif
-			
+
 			#ifdef DEBUG
 			DPRINTF("App was blocked from using syscall8\n");
 			#endif
@@ -402,7 +415,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		pid_blocked = pid;
 		return ENOSYS;
 	}
-	
+
 	#ifdef PS3M_API
 	if (3 <= ps3mapi_partial_disable_syscall8)
 	{
@@ -421,14 +434,14 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		}
 		return ENOSYS;
 	}
-	
-	if ((function != SYSCALL8_OPCODE_PS3MAPI) && (2 <= ps3mapi_partial_disable_syscall8))	return ENOSYS;	
+
+	if ((function != SYSCALL8_OPCODE_PS3MAPI) && (2 <= ps3mapi_partial_disable_syscall8))	return ENOSYS;
 	#endif
-	
+
 	switch (function)
-	{       	
+	{
 		#ifdef PS3M_API
-		case SYSCALL8_OPCODE_PS3MAPI:	
+		case SYSCALL8_OPCODE_PS3MAPI:
 			switch ((int)param1)
 			{
 				//----------
@@ -546,14 +559,14 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				break;
 			}
 		break;
-		
+
 		#endif
-		
+
 		#ifdef KW_STEALTH_EXT
 		case SYSCALL8_OPCODE_STEALTH_TEST:  //KW PSNPatch stealth extension compatibility
 			return SYSCALL8_STEALTH_OK;
 		break;
-		
+
 		case SYSCALL8_OPCODE_STEALTH_ACTIVATE: //KW PSNPatch stealth extension compatibility
 		{
 				uint64_t syscall_not_impl = *(uint64_t *)MKA(syscall_table_symbol);
@@ -573,7 +586,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		}
 		break;
 		#endif
-		
+
 		case SYSCALL8_OPCODE_GET_MAMBA:
 			return 0x666;
 		break;
@@ -615,8 +628,8 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_PSX_DISCFILE:
-			return ENOSYS;
-			//return sys_storage_ext_mount_psx_discfile((char *)param1, param2, (ScsiTrackDescriptor *)param3);
+			//return ENOSYS;
+			return sys_storage_ext_mount_psx_discfile((char *)param1, param2, (ScsiTrackDescriptor *)param3);
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_PS2_DISCFILE:
@@ -650,12 +663,12 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		case SYSCALL8_OPCODE_AIO_COPY_ROOT:
 			return sys_aio_copy_root((char *)param1, (char *)param2);
 		break;
-		
+
 		case SYSCALL8_OPCODE_GET_ACCESS:
 		case SYSCALL8_OPCODE_REMOVE_ACCESS:
-			return 0;//needed for mmCM 
+			return 0;//needed for mmCM
 		break;
-		
+
 		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
 		case SYSCALL8_OPCODE_SET_PSP_UMDFILE:
 		case SYSCALL8_OPCODE_SET_PSP_DECRYPT_OPTIONS:
@@ -679,10 +692,10 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			return sys_prx_unload_vsh_plugin(param1);
 		break;
 
-        default:		
+        default:
 		#ifdef PS3M_API
 		if (1 <= ps3mapi_partial_disable_syscall8)	return ENOSYS;
-		#endif		
+		#endif
 		if (extended_syscall8.addr)
 		{
 			// Lets handle a few hermes opcodes ourself, and let their payload handle the rest
@@ -710,10 +723,10 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			#ifdef DEBUG
 			DPRINTF("Handling control to HB syscall 8 (opcode=0x%lx)\n", function);
 			#endif
-			
+
 			return syscall8_hb(function, param1, param2, param3, param4, param5, param6, param7);
 		}
-		else if (function >= 0xA000)
+		else // if (function >= 0xA000) // AV: allow peek all other addresses
 		{
 			// Partial support for lv1_peek here
 			return lv1_peekd(function);
@@ -742,7 +755,7 @@ typedef struct
 
 static Patch kernel_patches[] =
 {
-	// User thread prio hack (needed for netiso)	
+	// User thread prio hack (needed for netiso)
 	{ user_thread_prio_patch, NOP },
 	{ user_thread_prio_patch2, NOP },
 };
@@ -755,7 +768,7 @@ static INLINE void apply_kernel_patches(void)
 	{
 		uint32_t *addr= (uint32_t *)MKA(kernel_patches[i].address);
 		*addr = kernel_patches[i].data;
-		clear_icache(addr, 4);		
+		clear_icache(addr, 4);
 	}
 }
 
@@ -777,18 +790,18 @@ int main(void)
 	extern uint64_t _start;
 	extern uint64_t __self_end;
 	DPRINTF("MAMBA says hello (load base = %p, end = %p) (version = %08X)\n", &_start, &__self_end, MAKE_VERSION(MAMBA_VERSION, FIRMWARE_VERSION, IS_CFW));
-	#endif	
-	
-	if (!vsh_process) vsh_process = get_vsh_process(); //NzV 
+	#endif
+
+	if (!vsh_process) vsh_process = get_vsh_process(); //NzV
     storage_ext_init();
     modules_patch_init();
 	#ifdef DO_PATCH_KERNEL_PATCH
-	apply_kernel_patches();	
+	apply_kernel_patches();
 	#endif
 	map_path_patches(1);
 	storage_ext_patches();
-    region_patches();	
-	
+    region_patches();
+
 	//Check if Iris (sky) payload is loaded
 	extended_syscall8.addr = 0;
 	uint64_t sys8_id = *((uint64_t *)MKA(0x4f0));
@@ -798,7 +811,7 @@ int main(void)
 		sys8_id&= 0xffffffffULL;
 		extended_syscall8.addr = (void *) *((uint64_t *)MKA(0x8000000000000000ULL + (sys8_id + 0x20ULL)));
 		extended_syscall8.toc = (void *) *(uint64_t *)(MKA(0x3000));
-		//Remove syscall40 used by Iris (sky) payload to load MAMBA	
+		//Remove syscall40 used by Iris (sky) payload to load MAMBA
 		uint64_t syscall_not_impl = *(uint64_t *)MKA(syscall_table_symbol);
 		*(uint64_t *)MKA(syscall_table_symbol+ ( 8* 40)) = syscall_not_impl;
 	}
