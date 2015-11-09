@@ -2178,8 +2178,10 @@ static INLINE int get_psx_video_mode(void)
 	return ret;
 }
 
-/* static INLINE void do_video_mode_patch(void)
+static INLINE void do_video_mode_patch(void)
 {
+	if(vmode_patch_offset == 0) return;
+
 	process_t p = get_current_process_critical();
 
 	if (!vsh_process) vsh_process = get_vsh_process(); //NzV
@@ -2225,7 +2227,7 @@ static INLINE int get_psx_video_mode(void)
 			copy_to_user(&patch, (void *)(vmode_patch_offset+0x10000), 4);
 		}
 	}
-} */
+}
 
 int process_cmd(unsigned int command, void *indata, uint64_t inlen, void *outdata, uint64_t outlen)
 {
@@ -2235,7 +2237,7 @@ int process_cmd(unsigned int command, void *indata, uint64_t inlen, void *outdat
 	{
 		case STORAGE_COMMAND_GET_DEVICE_SIZE:
 
-			//do_video_mode_patch();
+			do_video_mode_patch();
 
 			if (disc_emulation != EMU_OFF)
 			{

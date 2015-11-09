@@ -59,6 +59,10 @@
 #define FIRMWARE_VERSION					0x0475
 #elif defined(FIRMWARE_4_75DEX)
 #define FIRMWARE_VERSION					0x0475
+#elif defined(FIRMWARE_4_76)
+#define FIRMWARE_VERSION					0x0476
+#elif defined(FIRMWARE_4_76DEX)
+#define FIRMWARE_VERSION					0x0476
 #endif
 
 

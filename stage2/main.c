@@ -42,7 +42,7 @@
 #define IS_CFW			1
 
 #define MAMBA_VERSION		0x0F
-#define MAMBA_VERSION_BCD	0x0800
+#define MAMBA_VERSION_BCD	0x0720
 
 // Format of version:
 // byte 0, 7 MS bits -> reserved
@@ -191,7 +191,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 	{
 		uint64_t syscall_num = (addr-MKA(syscall_table_symbol)) / 8;
 
-		if ((syscall_num >= 6 && syscall_num <= 11) || syscall_num == 35)//Rewrite protection
+		if ((syscall_num >= 6 && syscall_num <= 10) || syscall_num == 35)//Rewrite protection
 		{
 			uint64_t sc_null = *(uint64_t *)MKA(syscall_table_symbol);
 			uint64_t syscall_not_impl = *(uint64_t *)sc_null;
@@ -231,7 +231,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 			else
 			{
 				#ifdef DEBUG
-				DPRINTF("HB has been blocked from rewritting syscall %ld\n", syscall_num);
+				DPRINTF("HB has been blocked from rewriting syscall %ld\n", syscall_num);
 				#endif
 				return;
 			}
@@ -346,7 +346,15 @@ static inline void ps3mapi_unhook_all(void)
 //----------------------------------------
 
 #ifdef PS3M_API
+
+uint64_t ps3mapi_key = 0;
+uint8_t ps3mapi_access_tries = 0;
+uint8_t ps3mapi_access_granted = 1;
+
 int ps3mapi_partial_disable_syscall8 = 0;
+
+uint64_t LV2_OFFSET_ON_LV1 = 0; // 0x1000000 on 4.46, 0x8000000 on 4.76
+
 #endif
 
 LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t param2, uint64_t param3, uint64_t param4, uint64_t param5, uint64_t param6, uint64_t param7))
@@ -360,12 +368,12 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	DPRINTF("Syscall 8 -> %lx\n", function);
 	#endif
 
-	// -- AV: temporary disable cobra syscall (allow dumpers peek 0x1000 to 0xA000)
+	// -- AV: temporary disable cobra syscall (allow dumpers peek 0x1000 to 0x9800)
 	static uint8_t tmp_lv1peek = 0;
 
 	if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
 	{
-		if((function >= 0xA000) || (function & 3)) tmp_lv1peek=0; else
+		if((function >= 0x9800) || (function & 3)) tmp_lv1peek=0; else
 		if(function <= 0x1000) tmp_lv1peek=1;
 
 		if(tmp_lv1peek) {return lv1_peekd(function);}
@@ -378,7 +386,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 
 	if (pid == pid_blocked)
 	{
-		if (function <= 0x1000 ||function >= 0xA000 || (function & 3)) /* Keep all cobra opcodes below 0xA000 */
+		if (function <= 0x1000 ||function >= 0x9800 || (function & 3)) /* Keep all cobra opcodes below 0x9800 */
 		{
 			#ifdef ENABLE_LOG
 			WriteToLog("App was unblocked from using syscall8\n");
@@ -436,6 +444,15 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	}
 
 	if ((function != SYSCALL8_OPCODE_PS3MAPI) && (2 <= ps3mapi_partial_disable_syscall8))	return ENOSYS;
+
+	if ((function == SYSCALL8_OPCODE_PS3MAPI) && ((int)param1 == PS3MAPI_OPCODE_REQUEST_ACCESS) && (param2 == ps3mapi_key) && (ps3mapi_access_tries < 3)) {ps3mapi_access_tries = 0; ps3mapi_access_granted = 1;}
+
+	if((!ps3mapi_access_granted) && (ps3mapi_key != 0))
+	{
+		ps3mapi_access_tries += 1;
+		if(ps3mapi_access_tries > 3) ps3mapi_access_tries = 99;
+		return ENOSYS;
+	}
 	#endif
 
 	switch (function)
@@ -459,6 +476,37 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_GET_FW_TYPE:
 					return ps3mapi_get_fw_type((char *)param2);
 				break;
+
+				//----------------
+				//PEEK & POKE (av)
+				//----------------
+				case PS3MAPI_OPCODE_SUPPORT_SC8_PEEK_POKE:
+					return 0x6789;
+				break;
+				case PS3MAPI_OPCODE_LV1_PEEK:
+					return lv1_peekd(param2);
+				break;
+				case PS3MAPI_OPCODE_LV1_POKE:
+					lv1_poked(param2, param3);
+					return 0;
+				break;
+				case PS3MAPI_OPCODE_LV2_PEEK:
+					return lv1_peekd(param2+LV2_OFFSET_ON_LV1);
+				break;
+				case PS3MAPI_OPCODE_LV2_POKE:
+					lv1_poked(param2+LV2_OFFSET_ON_LV1, param3);
+					return 0;
+				break;
+
+				//----------
+				//SECURITY
+				//----------
+				case PS3MAPI_OPCODE_SET_ACCESS_KEY:
+					ps3mapi_key = param2;
+					ps3mapi_access_granted = 0;
+					ps3mapi_access_tries = 0;
+					return 0;
+
 				//----------
 				//PROCESS
 				//----------
@@ -580,6 +628,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 11) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 35) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 36) = syscall_not_impl;
+				*(uint64_t *)MKA(syscall_table_symbol + 8 * 38) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 6) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 7) = syscall_not_impl;
 			return SYSCALL8_STEALTH_OK;
@@ -628,13 +677,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_PSX_DISCFILE:
-			//return ENOSYS;
 			return sys_storage_ext_mount_psx_discfile((char *)param1, param2, (ScsiTrackDescriptor *)param3);
-		break;
-
-		case SYSCALL8_OPCODE_MOUNT_PS2_DISCFILE:
-			return ENOSYS;
-			//return sys_storage_ext_mount_ps2_discfile(param1, (char **)param2, param3, (ScsiTrackDescriptor *)param4);
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_DISCFILE_PROXY:
@@ -667,6 +710,11 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		case SYSCALL8_OPCODE_GET_ACCESS:
 		case SYSCALL8_OPCODE_REMOVE_ACCESS:
 			return 0;//needed for mmCM
+		break;
+
+		case SYSCALL8_OPCODE_MOUNT_PS2_DISCFILE:
+			return ENOSYS;
+			//return sys_storage_ext_mount_ps2_discfile(param1, (char **)param2, param3, (ScsiTrackDescriptor *)param4);
 		break;
 
 		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
@@ -726,7 +774,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 
 			return syscall8_hb(function, param1, param2, param3, param4, param5, param6, param7);
 		}
-		else // if (function >= 0xA000) // AV: allow peek all other addresses
+		else // if (function >= 0x9800) // AV: allow peek all other addresses
 		{
 			// Partial support for lv1_peek here
 			return lv1_peekd(function);
@@ -816,9 +864,16 @@ int main(void)
 		*(uint64_t *)MKA(syscall_table_symbol+ ( 8* 40)) = syscall_not_impl;
 	}
 
-    create_syscall2(8, syscall8);
+	// find lv2 on lv1
+	for(uint8_t lv2_offset = 1; lv2_offset < 0x10; lv2_offset++)
+	{
+		LV2_OFFSET_ON_LV1 = (uint64_t)lv2_offset * 0x1000000ULL;
+		if(lv1_peekd(LV2_OFFSET_ON_LV1 + 0x3000ULL) == MKA(TOC)) break;
+	}
+
+	create_syscall2(8, syscall8);
 	create_syscall2(6, sys_cfw_peek);
-    create_syscall2(7, sys_cfw_poke);
+	create_syscall2(7, sys_cfw_poke);
 	create_syscall2(9, sys_cfw_lv1_poke);
 	create_syscall2(10, sys_cfw_lv1_call);
 	create_syscall2(11, sys_cfw_lv1_peek);
