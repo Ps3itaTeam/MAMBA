@@ -41,6 +41,7 @@ static void check_and_correct(MambaConfig *cfg)
 	
 	if (!found) cfg->dvd_video_region = 0;	
 	
+	if (cfg->ps2softemu > 1)
 	cfg->ps2softemu = 0;
 	cfg->spoof_version = 0;
 	cfg->spoof_revision = 0;

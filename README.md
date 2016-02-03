@@ -1,9 +1,8 @@
 =====================================================================
-MAMBA + PS3M_API
+MAMBA + PS3M_API + PS2 ISO SUPPORT
 =====================================================================
 
-Version of mamba who include ps3m_api_core by NzV.
-	
+Version of mamba who include ps3m_api_core by NzV and ps2 iso support by Ps3ita Team
 
 ----------------------------------------------------------------------
 ORIGINAL README

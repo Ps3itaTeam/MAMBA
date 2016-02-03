@@ -1,4 +1,4 @@
-MAMBA_VER = 4_76
+MAMBA_VER = 4_78
 
 ifeq ($(OS),Windows_NT)
 	ZLIBUTIL = ./zlibutil.exe

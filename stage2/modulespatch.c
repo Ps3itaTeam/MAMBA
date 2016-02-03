@@ -12,6 +12,7 @@
 #include <lv2/security.h>
 #include <lv2/thread.h>
 #include <lv2/syscall.h>
+#include <lv1/patch.h>
 
 #include "common.h"
 #include "modulespatch.h"
@@ -26,6 +27,8 @@
 //DYNAMIC MODULES PATCH
 //----------------------------------------
 #define DO_PATCH //libfs.sprx
+
+//If you want PS2 ISO support add the CFLAGS "DO_PATCH_PS2ISO" to Makefile_X.XX
 //----------------------------------------
 
 LV2_EXPORT int decrypt_func(uint64_t *, uint32_t *);
@@ -124,25 +127,104 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, pre_modules_verification, (uint32_t *re
 	return 0;
 }
 
-
-#ifdef DEBUG
-
 static char *hash_to_name(uint64_t hash)
 {
+	//I know, i know.. this look as shit..
 	if (hash == LIBFS_EXTERNAL_HASH)
-	{
-		return "libfs.sprx";
-	}
-
+	  return "libfs.sprx";
+#ifdef DO_PATCH_PS2
+	else if(hash == EXPLORE_PLUGIN_HASH
+#ifdef EXPLORE_PLUGIN_FERROX_HASH
+	|| hash == EXPLORE_PLUGIN_FERROX_HASH
+#endif
+#ifdef EXPLORE_PLUGIN_HABIB_HASH
+	|| hash == EXPLORE_PLUGIN_HABIB_HASH
+#endif
+#ifdef EXPLORE_PLUGIN_MIRA_HASH 
+	|| hash == EXPLORE_PLUGIN_MIRA_HASH
+#endif
+#ifdef EXPLORE_PLUGIN_REBUG_HASH
+	|| hash == EXPLORE_PLUGIN_REBUG_HASH
+#endif
+#ifdef EXPLORE_PLUGIN_REBUG_LITE_HASH
+	|| hash == EXPLORE_PLUGIN_REBUG_LITE_HASH
+#endif
+#ifdef EXPLORE_PLUGIN_ROGERO_HASH
+	|| hash == EXPLORE_PLUGIN_ROGERO_HASH
+#endif
+	) return "explore_plugin.sprx";
+	else if(hash == EXPLORE_CATEGORY_GAME_HASH 
+#ifdef EXPLORE_CATEGORY_GAME_REBUG_HASH
+	|| hash == EXPLORE_CATEGORY_GAME_REBUG_HASH
+#endif
+#ifdef EXPLORE_CATEGORY_GAME_ROGERO_HASH
+	|| hash == EXPLORE_CATEGORY_GAME_ROGERO_HASH
+#endif
+	) return "explore_category_game.sprx";
+	else if(hash == GAME_EXT_PLUGIN_HASH
+#ifdef GAME_EXT_PLUGIN_HABIB_HASH	 
+	|| hash == GAME_EXT_PLUGIN_HABIB_HASH
+#endif
+#ifdef GAME_EXT_PLUGIN_REBUG_HASH
+	|| hash == GAME_EXT_PLUGIN_REBUG_HASH
+#endif
+#ifdef GAME_EXT_PLUGIN_REBUG_LITE_HASH	 
+	|| hash == GAME_EXT_PLUGIN_REBUG_LITE_HASH
+#endif
+	) return "game_ext_plugin.sprx";
+#endif
 	return "UNKNOWN";
 }
 
+#ifdef DO_PATCH
+#ifdef DO_PATCH_PS2
+uint8_t condition_ps2softemu = 0;
+
+SprxPatch explore_plugin_patches[] =
+{
+	{ ps2_nonbw_offset, LI(0, 1), &condition_ps2softemu },
+	{ 0 }
+};
+
+
+SprxPatch explore_category_game_patches[] =
+{
+	{ ps2_nonbw_offset2, LI(R0, 1), &condition_ps2softemu },
+	{ 0 }
+};
+
+SprxPatch game_ext_plugin_patches[] =
+{
+	{ ps2_nonbw_offset3, LI(R0, 1), &condition_ps2softemu },
+	{ 0 }
+};
+
+//REBUG REX
+#ifdef dex_ps2_nonbw_offset
+SprxPatch rebug_explore_plugin_patches[] =
+{
+	{ dex_ps2_nonbw_offset, LI(0, 1), &condition_ps2softemu },
+	{ 0 }
+};
+#endif
+#ifdef dex_ps2_nonbw_offset2
+SprxPatch rebug_explore_category_game_patches[] =
+{
+	{ dex_ps2_nonbw_offset2, LI(R0, 1), &condition_ps2softemu },
+	{ 0 }
+};
+#endif
+#ifdef dex_ps2_nonbw_offset3
+SprxPatch rebug_game_ext_plugin_patches[] =
+{
+	{ dex_ps2_nonbw_offset3, LI(R0, 1), &condition_ps2softemu },
+	{ 0 }
+};
 #endif
 
+#endif
 
 uint8_t condition_apphome = 0; //JB format game
-
-#ifdef DO_PATCH
 
 SprxPatch libfs_external_patches[] =
 {
@@ -161,11 +243,51 @@ SprxPatch libfs_external_patches[] =
 	{ aio_copy_root_offset+0x2C, BLR, &condition_apphome },
 	{ 0 }
 };
+
 #define N_PATCH_TABLE_ENTRIES	(sizeof(patch_table) / sizeof(PatchTableEntry))
 
 PatchTableEntry patch_table[] =
 {
+	//same shit..
 	{ LIBFS_EXTERNAL_HASH, libfs_external_patches },
+#ifdef DO_PATCH_PS2
+	{ EXPLORE_PLUGIN_HASH, explore_plugin_patches },
+#ifdef EXPLORE_PLUGIN_FERROX_HASH
+	{ EXPLORE_PLUGIN_FERROX_HASH, explore_plugin_patches },
+#endif
+#ifdef EXPLORE_PLUGIN_HABIB_HASH
+	{ EXPLORE_PLUGIN_HABIB_HASH, explore_plugin_patches },
+#endif
+#ifdef EXPLORE_PLUGIN_MIRA_HASH
+	{ EXPLORE_PLUGIN_MIRA_HASH, explore_plugin_patches },
+#endif
+#ifdef EXPLORE_PLUGIN_REBUG_HASH
+	{ EXPLORE_PLUGIN_REBUG_HASH, rebug_explore_plugin_patches },
+#endif
+#ifdef EXPLORE_PLUGIN_REBUG_LITE_HASH
+	{ EXPLORE_PLUGIN_REBUG_LITE_HASH, explore_plugin_patches },
+#endif
+#ifdef EXPLORE_PLUGIN_ROGERO_HASH
+	{ EXPLORE_PLUGIN_ROGERO_HASH, explore_plugin_patches },
+#endif
+	{ EXPLORE_CATEGORY_GAME_HASH, explore_category_game_patches },
+#ifdef EXPLORE_CATEGORY_GAME_REBUG_HASH
+	{ EXPLORE_CATEGORY_GAME_REBUG_HASH, rebug_explore_category_game_patches },
+#endif
+#ifdef EXPLORE_CATEGORY_GAME_ROGERO_HASH
+	{ EXPLORE_CATEGORY_GAME_ROGERO_HASH, explore_category_game_patches },
+#endif
+	{ GAME_EXT_PLUGIN_HASH, game_ext_plugin_patches },
+#ifdef GAME_EXT_PLUGIN_HABIB_HASH
+	{ GAME_EXT_PLUGIN_HABIB_HASH, game_ext_plugin_patches },
+#endif
+#ifdef GAME_EXT_PLUGIN_REBUG_HASH
+	{ GAME_EXT_PLUGIN_REBUG_HASH, rebug_game_ext_plugin_patches },
+#endif
+#ifdef GAME_EXT_PLUGIN_REBUG_LITE_HASH
+	{ GAME_EXT_PLUGIN_REBUG_LITE_HASH, game_ext_plugin_patches },
+#endif
+#endif
 };
 
 #endif
@@ -192,7 +314,7 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 	uint32_t *p = (uint32_t *)arg1[0x18/8];
 
 	#ifdef DEBUG
-	DPRINTF("Flags = %x      %x\n", self->flags, (p[0x30/4] >> 16));
+//	DPRINTF("Flags = %x      %x\n", self->flags, (p[0x30/4] >> 16));
 	#endif
 
 	// +4.30 -> 0x13 (exact firmware since it happens is unknown)
@@ -323,15 +445,16 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 		#ifdef DEBUG
 		DPRINTF("hash = %lx\n", hash);
 		#endif
+		
         #ifdef DO_PATCH
 		for (int i = 0; i < N_PATCH_TABLE_ENTRIES; i++)
 		{
 			if (patch_table[i].hash == hash)
-			{
+			{		
 				#ifdef DEBUG
 				DPRINTF("Now patching %s %lx\n", hash_to_name(hash), hash);
 				#endif
-
+			
 				int j = 0;
 				SprxPatch *patch = &patch_table[i].patch_table[j];
 
@@ -345,12 +468,11 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 					j++;
 					patch = &patch_table[i].patch_table[j];
 				}
-
 				break;
 			}
 		}
-        #endif
 	}
+        #endif
 
 	return 0;
 }
@@ -645,6 +767,7 @@ void modules_patch_init(void)
 
 	hook_function_with_precall(lv1_call_99_wrapper_symbol, post_lv1_call_99_wrapper, 2);
 	patch_call(patch_func2 + patch_func2_offset, modules_patching);
+	
 	hook_function_with_cond_postcall(modules_verification_symbol, pre_modules_verification, 2);
 	#ifdef PS3M_API
 	hook_function_with_postcall(map_process_memory_symbol, pre_map_process_memory, 7);

@@ -22,11 +22,11 @@ BUILD_TYPE     	= release
 
 CFLAGS = -ffunction-sections -fdata-sections -O2 -m64 -fno-builtin -fno-exceptions \
 			   -Wall -Wno-strict-aliasing -Wno-multichar $(foreach dir,$(INCLUDE),-I$(dir)) \
-			   -DLV2 -DUSE_LV1_PEEK_POKE -DFIRMWARE_$(MAMBA_VER) -DPS3M_API  -DKW_STEALTH_EXT -DIS_MAMBA -ffreestanding
+			   -DLV2 -DUSE_LV1_PEEK_POKE -DFIRMWARE_$(MAMBA_VER) -DPS3M_API  -DKW_STEALTH_EXT -DIS_MAMBA -DDO_PATCH_PS2 -ffreestanding
 CFLAGS += --std=gnu99
 
 ifeq ($(BUILD_TYPE), debug)
-CFLAGS += -DDEBUG -DTEST 
+CFLAGS += -DDEBUG -DTEST
 endif
 
 LDFLAGS= -T stage2/stage2.ld -nostartfiles -nostdlib -nodefaultlibs -Wl,-static -L. $(foreach dir,$(LIBSDIR),-L$(dir)) $(LIBS) \
@@ -49,7 +49,7 @@ objdump: stage$(MAMBA_VER).bin
 	$(OBJDUMP) -D -EB -b binary -m powerpc:common64 mamba_$(MAMBA_VER).bin
 
 %.bin: %.elf
-	$(OBJCOPY) -O binary $< $@	
+	$(OBJCOPY) -O binary $< $@
 	$(ZLIBUTIL) mamba_$(MAMBA_VER).bin mamba_$(MAMBA_VER).lz.bin
 
 mamba_$(MAMBA_VER).elf: $(OBJS) stage2/stage2.ld

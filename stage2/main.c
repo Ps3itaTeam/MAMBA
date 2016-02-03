@@ -1,6 +1,8 @@
 /*
  'Mamba' is the payload version of Cobra code CFW (developed by Cobra Team) for Iris Manager
  and updated by NzV to work without Iris (sky) payload (also autoboot features)
+ 
+ PS2 ISO support added by Ps3ita Team
 
  LICENSED under GPL v3.0
 
@@ -371,7 +373,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	// -- AV: temporary disable cobra syscall (allow dumpers peek 0x1000 to 0x9800)
 	static uint8_t tmp_lv1peek = 0;
 
-	if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
+if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
 	{
 		if((function >= 0x9800) || (function & 3)) tmp_lv1peek=0; else
 		if(function <= 0x1000) tmp_lv1peek=1;
@@ -679,7 +681,11 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		case SYSCALL8_OPCODE_MOUNT_PSX_DISCFILE:
 			return sys_storage_ext_mount_psx_discfile((char *)param1, param2, (ScsiTrackDescriptor *)param3);
 		break;
-
+#ifdef DO_PATCH_PS2
+		case SYSCALL8_OPCODE_MOUNT_PS2_DISCFILE:
+			return sys_storage_ext_mount_ps2_discfile(param1, (char **)param2, param3, (ScsiTrackDescriptor *)param4);
+		break;
+#endif
 		case SYSCALL8_OPCODE_MOUNT_DISCFILE_PROXY:
 			return sys_storage_ext_mount_discfile_proxy(param1, param2, param3, param4, param5, param6, (ScsiTrackDescriptor *)param7);
 		break;
@@ -710,11 +716,6 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		case SYSCALL8_OPCODE_GET_ACCESS:
 		case SYSCALL8_OPCODE_REMOVE_ACCESS:
 			return 0;//needed for mmCM
-		break;
-
-		case SYSCALL8_OPCODE_MOUNT_PS2_DISCFILE:
-			return ENOSYS;
-			//return sys_storage_ext_mount_ps2_discfile(param1, (char **)param2, param3, (ScsiTrackDescriptor *)param4);
 		break;
 
 		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
@@ -803,10 +804,15 @@ typedef struct
 
 static Patch kernel_patches[] =
 {
+#ifdef DO_PATCH_PS2
+	// sys_sm_shutdown, for ps2 let's pass to copy_from_user a fourth parameter
+	{ shutdown_patch_offset, MR(R6, R31) },
+#endif
 	// User thread prio hack (needed for netiso)
 	{ user_thread_prio_patch, NOP },
 	{ user_thread_prio_patch2, NOP },
 };
+
 
 #define N_KERNEL_PATCHES	(sizeof(kernel_patches) / sizeof(Patch))
 
@@ -818,6 +824,206 @@ static INLINE void apply_kernel_patches(void)
 		*addr = kernel_patches[i].data;
 		clear_icache(addr, 4);
 	}
+}
+
+#endif
+
+int vsh_type = 0x666;
+
+//Only rebug 
+void get_rebug_vsh()
+{
+	CellFsStat stat;
+	
+	if(cellFsStat("/dev_flash/vsh/module/vsh.self.cexsp", &stat) == 0)
+		vsh_type = 0xDE;
+		
+	else if(cellFsStat("/dev_flash/vsh/module/vsh.self.dexsp", &stat) == 0)
+		vsh_type = 0xCE;
+	
+	#ifdef DEBUG	
+	if(vsh_type != 0x666)
+		DPRINTF("We are in CFW Rebug REX, VSH is %XX\n", vsh_type);
+	#endif
+}
+
+#ifdef DO_PATCH_PS2
+int ps2_patches_done = 0;
+
+static INLINE void ps2_vsh_patches()
+{	
+	if(condition_ps2softemu == 0 || ps2_patches_done)
+		return;
+	
+	ps2_patches_done = 1; //not needed.. anyway..
+	
+	uint64_t ps2tonet = ps2tonet_patch, ps2tonet_size = ps2tonet_size_patch;
+	uint64_t vsh_offset = 0, vsh_size = 0;
+	uint64_t value = 0, addr = 0, addr2 = 0, mv_offset = 0;
+	int i, z;
+	
+	if(vsh_type == 0xCE)
+	{
+		//REBUG REX lv2 DEX and vsh CEX
+		#ifdef cex_ps2tonet_patch
+		ps2tonet = cex_ps2tonet_patch;
+		#endif
+		#ifdef cex_ps2tonet_size_patch
+		ps2tonet_size = cex_ps2tonet_size_patch;
+		#endif
+	}
+	else if(vsh_type == 0xDE)
+	{
+		//REBUG REX lv2 CEX and vsh DEX
+		#ifdef dex_ps2tonet_patch
+		ps2tonet = dex_ps2tonet_patch;
+		#endif
+		#ifdef dex_ps2tonet_size_patch
+		ps2tonet_size = dex_ps2tonet_size_patch;
+		#endif
+	}
+		
+	//Find vsh position and size
+	//First try with static offset..
+	if(lv1_peekd(vsh_pos_in_ram + 0x200) == 0xF821FF917C0802A6ULL)
+	{
+		if(lv1_peekd(vsh_pos_in_ram + 0x208) == 0xF80100804800039DULL)
+		{
+			if(lv1_peekd(vsh_pos_in_ram + 0x210) == 0x6000000048000405ULL)
+			{
+				vsh_offset = vsh_pos_in_ram;
+				vsh_size = lv1_peekd(vsh_offset + 0x28);
+				#ifdef DEBUG
+				DPRINTF("Vsh.self found with static offset at address 0x%lx, size 0x%lx\n", vsh_offset, vsh_size);
+				#endif
+			}
+		}
+	}
+	//..if that not work brute-force the address
+	else
+	{
+		for(i = 0x10000; i < 0x1000000; i += 0x10000)
+		{
+			if(lv1_peekd(i + 0x200) == 0xF821FF917C0802A6ULL)
+			{
+				if(lv1_peekd(i + 0x208) == 0xF80100804800039DULL)
+				{
+					if(lv1_peekd(i + 0x210) == 0x6000000048000405ULL)
+					{
+						vsh_offset = i;
+						vsh_size = lv1_peekd(vsh_offset + 0x28);
+						#ifdef DEBUG
+						DPRINTF("Vsh.self found with brute-force at address 0x%lx, size 0x%lx\n", vsh_offset, vsh_size);
+						#endif
+						break;
+					}
+				}
+			}	
+		}
+	}
+	//Vsh not found
+	if(vsh_size == 0 || vsh_offset == 0)
+	{
+		#ifdef DEBUG
+		DPRINTF("Vsh.self not found!!\n");
+		#endif
+		return;
+	}
+	
+	//Find ps2tonet_patch patches
+	//First try with static offset..	
+	addr = (vsh_offset + ps2tonet_size);
+	addr2 = (vsh_offset + ps2tonet);
+
+	for(i = 0; i < 3; i++)
+	{
+		value = lv1_peekd(addr + mv_offset);
+		if(value == 0x3800004078640020ULL)
+		{
+			if(lv1_peekw(addr2 + mv_offset) == 0x60638204)
+			{
+				#ifdef DEBUG
+				DPRINTF("Ps2tonet patches are always there, nothing to do!\n");
+				#endif
+				return;
+			}
+		}
+		else if(value == 0x38A004F078640020ULL)
+		{
+			if(lv1_peekw(addr2 + mv_offset) == 0x60638202)
+			{
+				#ifdef DEBUG
+				DPRINTF("Offset ps2tonet_size_patch found with static offset at address: 0x%lx\n", addr + mv_offset);
+				DPRINTF("Offset ps2tonet_patch found with static offset at address: 0x%lx\n", addr2 + mv_offset);
+				#endif
+			
+				lv1_pokew(addr + mv_offset, LI(R5, 0x40));
+				lv1_pokew(addr2 + mv_offset, ORI(R3, R3, 0x8204));
+			
+				#ifdef DEBUG
+				value = lv1_peekw(addr + mv_offset);
+				DPRINTF("First poke: 0x%lx\n", value);
+				value = lv1_peekw(addr2 + mv_offset);
+				DPRINTF("Second poke: 0x%lx\n", value);
+				DPRINTF("SUCCESS: all patches DONE!\n");
+				#endif
+				return;
+			}
+		}
+		if(i == 1)
+			mv_offset = 0x500000;
+		//Sometimes after a reboot to LPAR1 the vsh is truncate in two pieces and the offset of ps2tonet_patch is moved of 0x1500000 bytes instead of 0x500000 bytes
+		if(i == 2)
+			mv_offset = 0x1500000;
+	}
+	
+	vsh_offset += 0x700;
+	
+	//brute-force the address
+	for(z = 0; z < 2; z++)
+	{
+		for(i = 0; i < vsh_size; i += 4)
+		{
+			if(lv1_peekd(vsh_offset + i) == 0x3860000060638202ULL)
+			{	
+				addr = (vsh_offset + i + 4);		
+				#ifdef DEBUG
+				DPRINTF("Offset ps2tonet_patch found with brute-force at address 0x%lx\n", addr);
+				#endif
+				
+				addr2 = (addr - 12);
+				if(lv1_peekd(addr2) == 0x38A004F078640020ULL)
+				{
+					#ifdef DEBUG
+					DPRINTF("Offset ps2tonet_size_patch found with brute-force at address 0x%lx\n", addr2);
+					#endif
+						
+					lv1_pokew(addr, ORI(R3, R3, 0x8204));
+					lv1_pokew(addr2, LI(R5, 0x40));
+						
+					#ifdef DEBUG
+					value = lv1_peekw(addr);
+					DPRINTF("First poke: 0x%lx\n", value);
+					value = lv1_peekw(addr2);
+					DPRINTF("Second poke: 0x%lx\n", value);
+					DPRINTF("SUCCESS: all patches DONE!\n");
+					#endif
+					return;
+				}
+				else
+				{
+					#ifdef DEBUG
+					DPRINTF("WARNING: ps2tonet_size_patch not found!!\n");
+					#endif
+				}
+			}
+		}
+		vsh_offset += 0x15C0000;
+		vsh_size -= 0xC0700;
+	}
+	#ifdef DEBUG
+	DPRINTF("WARNING: ps2tonet patches not found!!\n");
+	#endif
 }
 
 #endif
@@ -839,17 +1045,22 @@ int main(void)
 	extern uint64_t __self_end;
 	DPRINTF("MAMBA says hello (load base = %p, end = %p) (version = %08X)\n", &_start, &__self_end, MAKE_VERSION(MAMBA_VERSION, FIRMWARE_VERSION, IS_CFW));
 	#endif
+	
+	get_rebug_vsh();
 
 	if (!vsh_process) vsh_process = get_vsh_process(); //NzV
     storage_ext_init();
     modules_patch_init();
-	#ifdef DO_PATCH_KERNEL_PATCH
+
 	apply_kernel_patches();
-	#endif
 	map_path_patches(1);
 	storage_ext_patches();
     region_patches();
-
+    
+    #ifdef DO_PATCH_PS2
+    ps2_vsh_patches();
+	#endif
+	
 	//Check if Iris (sky) payload is loaded
 	extended_syscall8.addr = 0;
 	uint64_t sys8_id = *((uint64_t *)MKA(0x4f0));
@@ -877,7 +1088,7 @@ int main(void)
 	create_syscall2(9, sys_cfw_lv1_poke);
 	create_syscall2(10, sys_cfw_lv1_call);
 	create_syscall2(11, sys_cfw_lv1_peek);
-
+	
 	//map_path("/app_home", "/dev_usb000", 0);
 
 	//CellFsStat stat;
