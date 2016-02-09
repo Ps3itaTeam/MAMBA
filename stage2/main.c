@@ -858,7 +858,7 @@ static INLINE void ps2_vsh_patches()
 	ps2_patches_done = 1; //not needed.. anyway..
 	
 	uint64_t ps2tonet = ps2tonet_patch, ps2tonet_size = ps2tonet_size_patch;
-	uint64_t vsh_offset = 0, vsh_size = 0;
+	uint64_t vsh_offset = 0;
 	uint64_t value = 0, addr = 0, addr2 = 0, mv_offset = 0;
 	int i, z;
 	
@@ -911,9 +911,8 @@ static INLINE void ps2_vsh_patches()
 					if(lv1_peekd(i + 0x210) == 0x6000000048000405ULL)
 					{
 						vsh_offset = i;
-						vsh_size = lv1_peekd(vsh_offset + 0x28);
 						#ifdef DEBUG
-						DPRINTF("Vsh.self found with brute-force at address 0x%lx, size 0x%lx\n", vsh_offset, vsh_size);
+						DPRINTF("Vsh.self found with brute-force at address 0x%lx\n", vsh_offset);
 						#endif
 						break;
 					}
@@ -922,7 +921,7 @@ static INLINE void ps2_vsh_patches()
 		}
 	}
 	//Vsh not found
-	if(vsh_size == 0 || vsh_offset == 0)
+	if(vsh_offset == 0)
 	{
 		#ifdef DEBUG
 		DPRINTF("Vsh.self not found!!\n");
@@ -982,7 +981,7 @@ static INLINE void ps2_vsh_patches()
 	//brute-force the address
 	for(z = 0; z < 2; z++)
 	{
-		for(i = 0; i < vsh_size; i += 4)
+		for(i = 0; i < 0x1000000; i += 4)
 		{
 			if(lv1_peekd(vsh_offset + i) == 0x3860000060638202ULL)
 			{	
@@ -1018,8 +1017,7 @@ static INLINE void ps2_vsh_patches()
 				}
 			}
 		}
-		vsh_offset += 0x15C0000;
-		vsh_size -= 0xC0700;
+		vsh_offset = 0x2000000;
 	}
 	#ifdef DEBUG
 	DPRINTF("WARNING: ps2tonet patches not found!!\n");
