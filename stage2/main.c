@@ -970,10 +970,10 @@ static INLINE void ps2_vsh_patches()
 				return;
 			}
 		}
-		if(i == 1)
+		if(i == 0)
 			mv_offset = 0x500000;
 		//Sometimes after a reboot to LPAR1 the vsh is truncate in two pieces and the offset of ps2tonet_patch is moved of 0x1500000 bytes instead of 0x500000 bytes
-		if(i == 2)
+		if(i == 1)
 			mv_offset = 0x1500000;
 	}
 	
