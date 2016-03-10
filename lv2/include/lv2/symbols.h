@@ -219,12 +219,13 @@
 #define patch_func2_offset                          0x2C //UNTOUCHED
 #define user_thread_prio_patch                      0x21B0C // bytes matched: 0x34  419DFF842B9E0BFF900100D0419D02587B8007A03FE080012FA0000363FF0009
 #define user_thread_prio_patch2                     0x21B18 // bytes matched: 0x28  419D02587B8007A03FE080012FA0000363FF0009419EFF64FB4100B87D3042A6
-#define shutdown_copy_params_call         0x99C0
-#define shutdown_patch_offset            0x99AC
+#define shutdown_copy_params_call         			0x99C0
+#define shutdown_patch_offset            			0x99AC
 #elif defined(FIRMWARE_4_21) //Ported by Joonie, Big thanks to @aldostools for his amazing tool and special thanks to Estwald who is the original creater of this mamba
 #define TOC                                         0x346390 //done
 #define open_shared_kernel_object_symbol            0x123FC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A1C // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x125ec
 #define alloc_symbol                                0x63ED8 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229E98E86900004BFFFEB8
 #define dealloc_symbol                              0x64314 // bytes matched: 0x38  E9229E987C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xF85C // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -333,6 +334,7 @@
 #define TOC                                         0x363E80 //done
 #define open_shared_kernel_object_symbol            0x12A44 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x12064 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12c34
 #define alloc_symbol                                0x677F0 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229F78E86900004BFFFEB8
 #define dealloc_symbol                              0x67C2C // bytes matched: 0x38  E9229F787C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xFEA4 // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -441,6 +443,7 @@
 #define TOC                     0x348200
 #define open_shared_kernel_object_symbol            0x123F8
 #define close_kernel_object_handle_symbol           0x11A18
+#define open_kernel_object_symbol					0x125e8
 #define alloc_symbol                                0x64028
 #define dealloc_symbol                              0x64464
 #define copy_to_user_symbol                         0xF858
@@ -549,6 +552,7 @@
 #define TOC                                         0x365CA0 //done
 #define open_shared_kernel_object_symbol            0x12A40 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x12060 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12c30
 #define alloc_symbol                                0x67940 // bytes matched: 0x14  2C2300007C85237838C000007C641B784D820020
 #define dealloc_symbol                              0x67D7C // bytes matched: 0x28*  7C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6FBA10078
 #define copy_to_user_symbol                         0xFEA0 // bytes matched: 0x60  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -657,6 +661,7 @@
 #define TOC                                         0x348210 //done
 #define open_shared_kernel_object_symbol            0x123FC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A1C // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x125ec
 #define alloc_symbol                                0x6402C // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229E98E86900004BFFFEB8
 #define dealloc_symbol                              0x64468 // bytes matched: 0x80  E9229E987C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xF85C // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -765,6 +770,7 @@
 #define TOC                                         0x3487D0 //done
 #define open_shared_kernel_object_symbol            0x12470 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A90 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12660
 #define alloc_symbol                                0x62F74 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229E90E86900004BFFFEB8
 #define dealloc_symbol                              0x633B0 // bytes matched: 0x80  E9229E907C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xF858 // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -873,6 +879,7 @@
 #define TOC                                         0x3487E0 //done
 #define open_shared_kernel_object_symbol            0x12474 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A94 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12664
 #define alloc_symbol                                0x62F78 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229E90E86900004BFFFEB8
 #define dealloc_symbol                              0x633B4 // bytes matched: 0x80  E9229E907C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xF85C // bytes matched: 0x80  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -981,6 +988,7 @@
 #define TOC                                         0x3665C0 //done
 #define open_shared_kernel_object_symbol            0x12ABC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x120DC // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12cac
 #define alloc_symbol                                0x66890 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229F70E86900004BFFFEB8
 #define dealloc_symbol                              0x66CCC // bytes matched: 0x80  E9229F707C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xFEA4 // bytes matched: 0x80  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -1089,6 +1097,7 @@
 #define TOC                                         0x348DF0
 #define open_shared_kernel_object_symbol            0x12474
 #define close_kernel_object_handle_symbol           0x11A94
+#define open_kernel_object_symbol					0x12664
 #define alloc_symbol                                0x62F78
 #define dealloc_symbol                              0x633B4
 #define copy_to_user_symbol                         0xF85C
@@ -1197,6 +1206,7 @@
 #define TOC                                         0x366BD0 // Checked
 #define open_shared_kernel_object_symbol            0x12ABC  // Checked
 #define close_kernel_object_handle_symbol           0x120DC  // Checked
+#define open_kernel_object_symbol					0x12cac
 #define alloc_symbol                                0x66890  // Checked
 #define dealloc_symbol                              0x66CCC  // Checked
 #define copy_to_user_symbol                         0xFEA4   // Checked
@@ -1306,6 +1316,7 @@
 #define TOC                                         0x34B160 //done
 #define open_shared_kernel_object_symbol            0x12470 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A90 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12660
 #define alloc_symbol                                0x62F74 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229E90E86900004BFFFEB8
 #define dealloc_symbol                              0x633B0 // bytes matched: 0x80  E9229E907C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xF858 // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -1414,6 +1425,7 @@
 #define TOC                                         0x36EC40 //done
 #define open_shared_kernel_object_symbol            0x12AB8 //done
 #define close_kernel_object_handle_symbol           0x120D8 //done
+#define open_kernel_object_symbol					0x12ca8
 #define alloc_symbol                                0x66944 //done
 #define dealloc_symbol                              0x66D80 //done
 #define copy_to_user_symbol                         0xFEA0 //done
@@ -1522,6 +1534,7 @@
 #define TOC                                         0x34B2E0 //
 #define open_shared_kernel_object_symbol            0x12474 //
 #define close_kernel_object_handle_symbol           0x11A94 //
+#define open_kernel_object_symbol					0x12664
 #define alloc_symbol                                0x62F78  //
 #define dealloc_symbol                              0x633B4 //
 #define copy_to_user_symbol                         0xF85C //
@@ -1630,6 +1643,7 @@
 #define TOC                                         0x370620 //done
 #define open_shared_kernel_object_symbol            0x12ABC // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x120DC // bytes matched: 0x3C  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12cac
 #define alloc_symbol                                0x66948 // bytes matched: 0x14  2C2300007C85237838C000007C641B784D820020
 #define dealloc_symbol                              0x66D84 // bytes matched: 0x28*  7C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6FBA10078
 #define copy_to_user_symbol                         0xFEA4 // bytes matched: 0x60  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -1738,6 +1752,7 @@
 #define TOC                     0x34E620 //
 #define open_shared_kernel_object_symbol            0x12484 //
 #define close_kernel_object_handle_symbol           0x11AA4 //CHECKED TILL HERE!!
+#define open_kernel_object_symbol					0x12674
 #define alloc_symbol                                0x643B4 //
 #define dealloc_symbol                              0x647F0 //
 #define copy_to_user_symbol                         0xF86C //
@@ -1846,6 +1861,7 @@
 #define TOC                                         0x3738E0 //done
 #define open_shared_kernel_object_symbol            0x12ACC //done
 #define close_kernel_object_handle_symbol           0x120EC //done
+#define open_kernel_object_symbol					0x12cbc
 #define alloc_symbol                                0x67D84 //done
 #define dealloc_symbol                              0x681C0 //done
 #define copy_to_user_symbol                         0xFEB4 //done
@@ -1954,6 +1970,7 @@
 #define TOC                                         0x34F950 //done
 #define open_shared_kernel_object_symbol            0x1240C // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A2C // bytes matched: 0x3C  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x125fc
 #define alloc_symbol                                0x64798 // bytes matched: 0x14  2C2300007C85237838C000007C641B784D820020
 #define dealloc_symbol                              0x64BD4 // bytes matched: 0x28*  7C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6FBA10078
 #define copy_to_user_symbol                         0xF868 // bytes matched: 0x60  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -2063,6 +2080,7 @@
 #define TOC                                         0x375500 //done
 #define open_shared_kernel_object_symbol            0x12A54 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x12074 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12c44
 #define alloc_symbol                                0x68168 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229FA8E86900004BFFFEB8
 #define dealloc_symbol                              0x685A4 // bytes matched: 0x80  E9229FA87C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xFEB0 // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -2172,6 +2190,7 @@
 #define TOC                                         0x34F960 //
 #define open_shared_kernel_object_symbol            0x12410 //
 #define close_kernel_object_handle_symbol           0x11A30 //
+#define open_kernel_object_symbol					0x12600
 #define alloc_symbol                                0x6479C //
 #define dealloc_symbol                              0x64BD8 //
 #define copy_to_user_symbol                         0xF86C //
@@ -2280,6 +2299,7 @@
 #define TOC                                         0x375510 //done
 #define open_shared_kernel_object_symbol            0x12A58 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x12078 // bytes matched: 0x3C  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12c48
 #define alloc_symbol                                0x6816C // bytes matched: 0x14  2C2300007C85237838C000007C641B784D820020
 #define dealloc_symbol                              0x685A8 // bytes matched: 0x28*  7C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6FBA10078
 #define copy_to_user_symbol                         0xFEB4 // bytes matched: 0x60  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -2388,6 +2408,7 @@
 #define TOC                                         0x34F960 // same as mamba 4.65
 #define open_shared_kernel_object_symbol            0x12410 // same as mamba 4.65
 #define close_kernel_object_handle_symbol           0x11A30 // same as mamba 4.65
+#define open_kernel_object_symbol					0x12600
 #define alloc_symbol                                0x6479C // same as mamba 4.65
 #define dealloc_symbol                              0x64BD8 // same as mamba 4.65
 #define copy_to_user_symbol                         0xF86C // same as mamba 4.65
@@ -2604,6 +2625,7 @@
 #define TOC                                         0x34FB10 //done
 #define open_shared_kernel_object_symbol            0x1240C // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A2C // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x125fc
 #define alloc_symbol                                0x64820 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229EC8E86900004BFFFEB8
 #define dealloc_symbol                              0x64C5C // bytes matched: 0x50  E9229EC87C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xF868 // bytes matched: 0x80  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -2712,6 +2734,7 @@
 #define TOC                                         0x375850 //done
 #define open_shared_kernel_object_symbol            0x12A54 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x12074 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12c44
 #define alloc_symbol                                0x681F0 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229FA8E86900004BFFFEB8
 #define dealloc_symbol                              0x6862C // bytes matched: 0x50  E9229FA87C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xFEB0 // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -2820,6 +2843,7 @@
 #define TOC                                         0x34FBB0 //done
 #define open_shared_kernel_object_symbol            0x12410 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x11A30 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12600 // Confirmed
 #define alloc_symbol                                0x64824 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229EC8E86900004BFFFEB8
 #define dealloc_symbol                              0x64C60 // bytes matched: 0x80  E9229EC87C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xF86C // bytes matched: 0x64  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070
@@ -2928,6 +2952,7 @@
 #define TOC                                         0x3758E0 //done
 #define open_shared_kernel_object_symbol            0x12A58 // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
 #define close_kernel_object_handle_symbol           0x12078 // bytes matched: 0x44  F821FF517C0802A6FBA10098FBE100A8FB410080FB610088FB810090FBC100A0
+#define open_kernel_object_symbol					0x12c48
 #define alloc_symbol                                0x681F4 // bytes matched: 0x80  2C2300007C85237838C000007C641B784D820020E9229FA8E86900004BFFFEB8
 #define dealloc_symbol                              0x68630 // bytes matched: 0x50  E9229FA87C85237838C000007C641B78E86900004BFFFBD0F821FF717C0802A6
 #define copy_to_user_symbol                         0xFEB4 // bytes matched: 0x80  2C2500007C0802A6F821FF71FBA10078FBC10080FBE100887C7E1B78FB810070

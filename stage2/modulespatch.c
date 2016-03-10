@@ -21,25 +21,19 @@
 #include "storage_ext.h"
 #include "syscall8.h"
 #include "self.h"
-
+#include "psp.h"
 
 //----------------------------------------
 //DYNAMIC MODULES PATCH
 //----------------------------------------
 #define DO_PATCH //libfs.sprx
 
-//If you want PS2 ISO support add the CFLAGS "DO_PATCH_PS2ISO" to Makefile_X.XX
-//----------------------------------------
+/* If you want only PS2 ISO support set in the Makefile_x.xx EMU_SUPPORT to ps2
+   If you want only PSP ISO support set in the Makefile_x.xx EMU_SUPPORT to psp
+   If you want PSP and PS2 ISO support set in the Makefile_x.xx EMU_SUPPORT to full
+//----------------------------------------*/
 
 LV2_EXPORT int decrypt_func(uint64_t *, uint32_t *);
-
-typedef struct
-{
-	uint32_t offset;
-	uint32_t data;
-	uint8_t *condition;
-} SprxPatch;
-
 
 typedef struct
 {
@@ -114,9 +108,10 @@ LV2_HOOKED_FUNCTION_PRECALL_2(int, post_lv1_call_99_wrapper, (uint64_t *spu_obj,
 LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, pre_modules_verification, (uint32_t *ret, uint32_t error))
 {
 	/* Patch original from psjailbreak. Needs some tweaks to fix some games */
-	#ifdef DEBUG
+/*	#ifdef DEBUG
 	DPRINTF("err = %x\n", error);
-	#endif
+	#endif */
+
 	/* if (error == 0x13)
 	{
 		//dump_stack_trace2(10);
@@ -126,55 +121,50 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, pre_modules_verification, (uint32_t *re
 	*ret = 0;
 	return 0;
 }
-
-static char *hash_to_name(uint64_t hash)
+#ifdef DEBUG
+static char *hash_to_name(uint64_t trunc_hash)
 {
-	//I know, i know.. this look as shit..
-	if (hash == LIBFS_EXTERNAL_HASH)
-	  return "libfs.sprx";
+	if(trunc_hash == (LIBFS_EXTERNAL_HASH >> 16))
+		return "libfs.sprx";
+#ifdef DO_PATCH_PSP
+	else if(trunc_hash == (PSP_EMULATOR_HASH >> 16))
+		return "psp_emulator.self";
+	else if(trunc_hash == (EMULATOR_API_HASH >> 16))
+		return "emulator_api.sprx";
+	else if(trunc_hash == (PEMUCORELIB_HASH >> 16))
+		return "PEmuCoreLib.sprx";
+	else if(trunc_hash == (LIBSYSUTIL_SAVEDATA_PSP_HASH >> 16))
+		return "libsysutil_savedata_psp.sprx";
+	else if(trunc_hash == (BASIC_PLUGINS_HASH >> 16))
+		return "basic_plugins.sprx";
+	#ifdef BASIC_PLUGINS_REBUG_HASH
+	else if(trunc_hash == (BASIC_PLUGINS_REBUG_HASH >> 16))
+		return "[Rebug] basic_plugins.sprx";
+	#endif
+#endif
 #ifdef DO_PATCH_PS2
-	else if(hash == EXPLORE_PLUGIN_HASH
-#ifdef EXPLORE_PLUGIN_FERROX_HASH
-	|| hash == EXPLORE_PLUGIN_FERROX_HASH
-#endif
-#ifdef EXPLORE_PLUGIN_HABIB_HASH
-	|| hash == EXPLORE_PLUGIN_HABIB_HASH
-#endif
-#ifdef EXPLORE_PLUGIN_MIRA_HASH 
-	|| hash == EXPLORE_PLUGIN_MIRA_HASH
-#endif
-#ifdef EXPLORE_PLUGIN_REBUG_HASH
-	|| hash == EXPLORE_PLUGIN_REBUG_HASH
-#endif
-#ifdef EXPLORE_PLUGIN_REBUG_LITE_HASH
-	|| hash == EXPLORE_PLUGIN_REBUG_LITE_HASH
-#endif
-#ifdef EXPLORE_PLUGIN_ROGERO_HASH
-	|| hash == EXPLORE_PLUGIN_ROGERO_HASH
-#endif
-	) return "explore_plugin.sprx";
-	else if(hash == EXPLORE_CATEGORY_GAME_HASH 
-#ifdef EXPLORE_CATEGORY_GAME_REBUG_HASH
-	|| hash == EXPLORE_CATEGORY_GAME_REBUG_HASH
-#endif
-#ifdef EXPLORE_CATEGORY_GAME_ROGERO_HASH
-	|| hash == EXPLORE_CATEGORY_GAME_ROGERO_HASH
-#endif
-	) return "explore_category_game.sprx";
-	else if(hash == GAME_EXT_PLUGIN_HASH
-#ifdef GAME_EXT_PLUGIN_HABIB_HASH	 
-	|| hash == GAME_EXT_PLUGIN_HABIB_HASH
-#endif
-#ifdef GAME_EXT_PLUGIN_REBUG_HASH
-	|| hash == GAME_EXT_PLUGIN_REBUG_HASH
-#endif
-#ifdef GAME_EXT_PLUGIN_REBUG_LITE_HASH	 
-	|| hash == GAME_EXT_PLUGIN_REBUG_LITE_HASH
-#endif
-	) return "game_ext_plugin.sprx";
+	else if(trunc_hash == (EXPLORE_PLUGIN_HASH >> 16))
+		return "explore_plugin.sprx";
+	else if(trunc_hash == (EXPLORE_CATEGORY_GAME_HASH >> 16))
+		return "explore_category_game.sprx";
+	else if(trunc_hash == (GAME_EXT_PLUGIN_HASH >> 16))
+		return "game_ext_plugin.sprx";
+	#ifdef EXPLORE_PLUGIN_REBUG_HASH
+	else if(trunc_hash == (EXPLORE_PLUGIN_REBUG_HASH >> 16))
+		return "[Rebug] explore_plugin.sprx";
+	#endif
+	#ifdef EXPLORE_CATEGORY_GAME_REBUG_HASH
+	else if(trunc_hash == (EXPLORE_CATEGORY_GAME_REBUG_HASH >> 16))
+		return "[Rebug] explore_category_game.sprx";
+	#endif
+	#ifdef GAME_EXT_PLUGIN_REBUG_HASH
+	else if(trunc_hash == (GAME_EXT_PLUGIN_REBUG_HASH >> 16))
+		return "[Rebug] game_ext_plugin.sprx";
+	#endif
 #endif
 	return "UNKNOWN";
 }
+#endif
 
 #ifdef DO_PATCH
 #ifdef DO_PATCH_PS2
@@ -185,7 +175,6 @@ SprxPatch explore_plugin_patches[] =
 	{ ps2_nonbw_offset, LI(0, 1), &condition_ps2softemu },
 	{ 0 }
 };
-
 
 SprxPatch explore_category_game_patches[] =
 {
@@ -221,7 +210,125 @@ SprxPatch rebug_game_ext_plugin_patches[] =
 	{ 0 }
 };
 #endif
+#endif
 
+#ifdef DO_PATCH_PSP
+uint8_t condition_psp_iso = 0;
+uint8_t condition_psp_dec = 0;
+uint8_t condition_psp_keys = 0;
+uint8_t condition_psp_change_emu = 0;
+uint8_t condition_psp_prometheus = 0;
+SprxPatch psp_emulator_patches[] =
+{
+	// Sets psp mode as opossed to minis mode. Increases compatibility, removes text protection and makes most savedata work
+	{ psp_set_psp_mode_offset, LI(R4, 0), &condition_psp_iso },
+	{ 0 }
+};
+
+SprxPatch emulator_api_patches[] =
+{
+	// Read umd patches
+	{ psp_read, STDU(SP, 0xFF90, SP), &condition_psp_iso },
+	{ psp_read+4, MFLR(R0), &condition_psp_iso },
+	{ psp_read+8, STD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_read+0x0C, MR(R8, R7), &condition_psp_iso },
+	{ psp_read+0x10, MR(R7, R6), &condition_psp_iso },
+	{ psp_read+0x14, MR(R6, R5), &condition_psp_iso },
+	{ psp_read+0x18, MR(R5, R4), &condition_psp_iso },
+	{ psp_read+0x1C, MR(R4, R3), &condition_psp_iso },
+	{ psp_read+0x20, LI(R3, SYSCALL8_OPCODE_READ_PSP_UMD), &condition_psp_iso },
+	{ psp_read+0x24, LI(R11, 8), &condition_psp_iso },
+	{ psp_read+0x28, SC, &condition_psp_iso },
+	{ psp_read+0x2C, LD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_read+0x30, MTLR(R0), &condition_psp_iso },
+	{ psp_read+0x34, ADDI(SP, SP, 0x70), &condition_psp_iso },
+	{ psp_read+0x38, BLR, &condition_psp_iso },
+	// Read header patches
+	{ psp_read+0x3C, STDU(SP, 0xFF90, SP), &condition_psp_iso },
+	{ psp_read+0x40, MFLR(R0), &condition_psp_iso },
+	{ psp_read+0x44, STD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_read+0x48, MR(R7, R6), &condition_psp_iso },
+	{ psp_read+0x4C, MR(R6, R5), &condition_psp_iso },
+	{ psp_read+0x50, MR(R5, R4), &condition_psp_iso },
+	{ psp_read+0x54, MR(R4, R3), &condition_psp_iso },
+	{ psp_read+0x58, LI(R3, SYSCALL8_OPCODE_READ_PSP_HEADER), &condition_psp_iso },
+	{ psp_read+0x5C, LI(R11, 8), &condition_psp_iso },
+	{ psp_read+0x60, SC, &condition_psp_iso },
+	{ psp_read+0x64, LD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_read+0x68, MTLR(R0), &condition_psp_iso },
+	{ psp_read+0x6C, ADDI(SP, SP, 0x70), &condition_psp_iso },
+	{ psp_read+0x70, BLR, &condition_psp_iso },
+	{ psp_read_header, MAKE_CALL_VALUE(psp_read_header, psp_read+0x3C), &condition_psp_iso },
+	// Drm patches
+	{ psp_drm_patch5, MAKE_JUMP_VALUE(psp_drm_patch5, psp_drm_patch6), &condition_psp_iso },
+	{ psp_drm_patch7, LI(R6, 0), &condition_psp_iso },
+	{ psp_drm_patch8, LI(R7, 0), &condition_psp_iso },
+	{ psp_drm_patch9, NOP, &condition_psp_iso },
+	{ psp_drm_patch11, LI(R6, 0), &condition_psp_iso },
+	{ psp_drm_patch12, LI(R7, 0), &condition_psp_iso },
+	// product id
+	{ psp_product_id_patch1, NOP, &condition_psp_iso },
+	{ psp_product_id_patch3, NOP, &condition_psp_iso },
+	{ 0 }
+};
+
+SprxPatch pemucorelib_patches[] =
+{
+	{ psp_eboot_dec_patch, LI(R6, 0x110), &condition_psp_dec }, // -> makes unsigned psp eboot.bin run, 0x10 works too
+	{ psp_prx_patch, STDU(SP, 0xFF90, SP), &condition_psp_iso },
+	{ psp_prx_patch+4, MFLR(R6), &condition_psp_iso },
+	{ psp_prx_patch+8, STD(R6, 0x80, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x0C, LI(R11, 8), &condition_psp_iso },
+	{ psp_prx_patch+0x10, MR(R5, R4), &condition_psp_iso },
+	{ psp_prx_patch+0x14, MR(R4, R3), &condition_psp_iso },
+	{ psp_prx_patch+0x18, LI(R3, SYSCALL8_OPCODE_PSP_PRX_PATCH), &condition_psp_iso },
+	{ psp_prx_patch+0x1C, SC, &condition_psp_iso },
+	{ psp_prx_patch+0x20, LD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x24, MTLR(R0), &condition_psp_iso },
+	{ psp_prx_patch+0x28, ADDI(SP, SP, 0x70), &condition_psp_iso },
+	{ psp_prx_patch+0x2C, BLR, &condition_psp_iso },
+	// Patch for savedata binding
+	{ psp_savedata_bind_patch1, MR(R5, R19), &condition_psp_iso },
+	{ psp_savedata_bind_patch2, MAKE_JUMP_VALUE(psp_savedata_bind_patch2, psp_prx_patch+0x30), &condition_psp_iso },
+	{ psp_prx_patch+0x30, LD(R19, 0xFF98, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x34, STDU(SP, 0xFF90, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x38, MFLR(R0), &condition_psp_iso },
+	{ psp_prx_patch+0x3C, STD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x40, LI(R11, 8), &condition_psp_iso },
+	{ psp_prx_patch+0x44, MR(R4, R3), &condition_psp_iso },
+	{ psp_prx_patch+0x48, LI(R3, SYSCALL8_OPCODE_PSP_POST_SAVEDATA_INITSTART), &condition_psp_iso },
+	{ psp_prx_patch+0x4C, SC, &condition_psp_iso },
+	{ psp_prx_patch+0x50, LD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x54, MTLR(R0), &condition_psp_iso },
+	{ psp_prx_patch+0x58, ADDI(SP, SP, 0x70), &condition_psp_iso },
+	{ psp_prx_patch+0x5C, BLR, &condition_psp_iso },
+	{ psp_savedata_bind_patch3, MAKE_JUMP_VALUE(psp_savedata_bind_patch3, psp_prx_patch+0x60), &condition_psp_iso },
+	{ psp_prx_patch+0x60, STDU(SP, 0xFF90, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x64, MFLR(R0), &condition_psp_iso },
+	{ psp_prx_patch+0x68, STD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x6C, LI(R11, 8), &condition_psp_iso },
+	{ psp_prx_patch+0x70, LI(R3, SYSCALL8_OPCODE_PSP_POST_SAVEDATA_SHUTDOWNSTART), &condition_psp_iso },
+	{ psp_prx_patch+0x74, SC, &condition_psp_iso },
+	{ psp_prx_patch+0x78, LD(R0, 0x80, SP), &condition_psp_iso },
+	{ psp_prx_patch+0x7C, MTLR(R0), &condition_psp_iso },
+	{ psp_prx_patch+0x80, ADDI(SP, SP, 0x70), &condition_psp_iso },
+	{ psp_prx_patch+0x84, BLR, &condition_psp_iso },
+	// Prometheus
+	{ psp_prometheus_patch, '.OLD', &condition_psp_prometheus },
+	// Extra save data patch required since some 3.60+ firmware
+	{ psp_extra_savedata_patch, LI(R31, 1), &condition_psp_iso },
+	{ 0 }
+};
+
+SprxPatch libsysutil_savedata_psp_patches[] =
+{
+	{ psp_savedata_patch1, MAKE_JUMP_VALUE(psp_savedata_patch1, psp_savedata_patch2), &condition_psp_iso },
+	{ psp_savedata_patch3, NOP, &condition_psp_iso },
+	{ psp_savedata_patch4, NOP, &condition_psp_iso },
+	{ psp_savedata_patch5, NOP, &condition_psp_iso },
+	{ psp_savedata_patch6, NOP, &condition_psp_iso },
+	{ 0 }
+};
 #endif
 
 uint8_t condition_apphome = 0; //JB format game
@@ -248,44 +355,34 @@ SprxPatch libfs_external_patches[] =
 
 PatchTableEntry patch_table[] =
 {
-	//same shit..
 	{ LIBFS_EXTERNAL_HASH, libfs_external_patches },
+#ifdef DO_PATCH_PSP
+	{ PSP_EMULATOR_HASH, psp_emulator_patches },
+	{ EMULATOR_API_HASH, emulator_api_patches },
+	{ PEMUCORELIB_HASH, pemucorelib_patches },
+	{ LIBSYSUTIL_SAVEDATA_PSP_HASH, libsysutil_savedata_psp_patches },
+#endif
 #ifdef DO_PATCH_PS2
 	{ EXPLORE_PLUGIN_HASH, explore_plugin_patches },
-#ifdef EXPLORE_PLUGIN_FERROX_HASH
-	{ EXPLORE_PLUGIN_FERROX_HASH, explore_plugin_patches },
+	{ EXPLORE_CATEGORY_GAME_HASH, explore_category_game_patches },
+	{ GAME_EXT_PLUGIN_HASH, game_ext_plugin_patches },
 #endif
-#ifdef EXPLORE_PLUGIN_HABIB_HASH
-	{ EXPLORE_PLUGIN_HABIB_HASH, explore_plugin_patches },
+};
+
+PatchTableEntry patch_table_rebug[] =
+{
+	{ LIBFS_EXTERNAL_HASH, libfs_external_patches },
+#ifdef DO_PATCH_PSP
+	{ PSP_EMULATOR_HASH, psp_emulator_patches },
+	{ EMULATOR_API_HASH, emulator_api_patches },
+	{ PEMUCORELIB_HASH, pemucorelib_patches },
+	{ LIBSYSUTIL_SAVEDATA_PSP_HASH, libsysutil_savedata_psp_patches },
 #endif
-#ifdef EXPLORE_PLUGIN_MIRA_HASH
-	{ EXPLORE_PLUGIN_MIRA_HASH, explore_plugin_patches },
-#endif
+#ifdef DO_PATCH_PS2
 #ifdef EXPLORE_PLUGIN_REBUG_HASH
 	{ EXPLORE_PLUGIN_REBUG_HASH, rebug_explore_plugin_patches },
-#endif
-#ifdef EXPLORE_PLUGIN_REBUG_LITE_HASH
-	{ EXPLORE_PLUGIN_REBUG_LITE_HASH, explore_plugin_patches },
-#endif
-#ifdef EXPLORE_PLUGIN_ROGERO_HASH
-	{ EXPLORE_PLUGIN_ROGERO_HASH, explore_plugin_patches },
-#endif
-	{ EXPLORE_CATEGORY_GAME_HASH, explore_category_game_patches },
-#ifdef EXPLORE_CATEGORY_GAME_REBUG_HASH
 	{ EXPLORE_CATEGORY_GAME_REBUG_HASH, rebug_explore_category_game_patches },
-#endif
-#ifdef EXPLORE_CATEGORY_GAME_ROGERO_HASH
-	{ EXPLORE_CATEGORY_GAME_ROGERO_HASH, explore_category_game_patches },
-#endif
-	{ GAME_EXT_PLUGIN_HASH, game_ext_plugin_patches },
-#ifdef GAME_EXT_PLUGIN_HABIB_HASH
-	{ GAME_EXT_PLUGIN_HABIB_HASH, game_ext_plugin_patches },
-#endif
-#ifdef GAME_EXT_PLUGIN_REBUG_HASH
 	{ GAME_EXT_PLUGIN_REBUG_HASH, rebug_game_ext_plugin_patches },
-#endif
-#ifdef GAME_EXT_PLUGIN_REBUG_LITE_HASH
-	{ GAME_EXT_PLUGIN_REBUG_LITE_HASH, game_ext_plugin_patches },
 #endif
 #endif
 };
@@ -447,12 +544,64 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 		#endif
 		
         #ifdef DO_PATCH
-		for (int i = 0; i < N_PATCH_TABLE_ENTRIES; i++)
+        uint64_t trunc_hash = (hash >> 16), plugin_trunc_hash = 0;
+        #ifdef DO_PATCH_PSP
+        uint64_t pspemu_off = pspemu_path_offset, psptrans_off = psptrans_path_offset;
+		
+		if(trunc_hash == (EMULATOR_DRM_HASH >> 16))
 		{
-			if (patch_table[i].hash == hash)
+			if (condition_psp_keys)
+				buf[psp_drm_tag_overwrite/4] = LI(R5, psp_code);
+		}
+		else if(trunc_hash == (EMULATOR_DRM_DATA_HASH >> 16))
+		{
+			if (condition_psp_keys)
+			{
+				buf[psp_drm_key_overwrite/4] = psp_tag;
+				memcpy(buf+((psp_drm_key_overwrite+8)/4), psp_keys, 16);
+			}
+		}
+		else if(trunc_hash == (BASIC_PLUGINS_HASH >> 16) 
+		#ifdef BASIC_PLUGINS_REBUG_HASH
+		|| trunc_hash == (BASIC_PLUGINS_REBUG_HASH >> 16)
+		#endif
+		)
+		{
+			if(condition_psp_change_emu)
+			{
+				//rebug rex 
+				if(vsh_type != 0x666)
+				{
+					#ifdef dex_pspemu_path_offset
+					pspemu_off = dex_pspemu_path_offset;
+					psptrans_off = dex_psptrans_path_offset;
+					//weird rebug 4.30 drex with basic_plugins CEX
+					#elif cex_pspemu_path_offset
+					pspemu_off = cex_pspemu_path_offset;
+					psptrans_off = cex_psptrans_path_offset;
+					#endif
+				}
+				#ifdef DEBUG
+				DPRINTF("pspemu_path_offset: 0x%lx\npsptrans_path_offset: 0x%lx\n", pspemu_off, psptrans_off);
+				#endif
+					
+				memcpy(((char *)buf)+pspemu_off, pspemu_path, sizeof(pspemu_path));
+				memcpy(((char *)buf)+psptrans_off, psptrans_path, sizeof(psptrans_path));
+			}
+		}
+		#endif
+		
+		if(vsh_type != 0x666)
+			*patch_table = *patch_table_rebug;
+		
+		for (int i = 0; i < N_PATCH_TABLE_ENTRIES; i++)
+		{		
+			plugin_trunc_hash = (patch_table[i].hash >> 16);
+			
+			if (plugin_trunc_hash == trunc_hash)
 			{		
 				#ifdef DEBUG
-				DPRINTF("Now patching %s %lx\n", hash_to_name(hash), hash);
+				DPRINTF("Now patching %s %lx\n", hash_to_name(trunc_hash), hash);
 				#endif
 			
 				int j = 0;
@@ -463,6 +612,9 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 					if (*patch->condition)
 					{
 						buf[patch->offset/4] = patch->data;
+						#ifdef  DEBUG
+						DPRINTF("Offset: 0x%08X | Data: 0x%08X\n", (uint32_t)patch->offset, (uint32_t)patch->data);
+						#endif
 					}
 
 					j++;

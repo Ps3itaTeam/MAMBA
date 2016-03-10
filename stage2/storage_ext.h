@@ -28,6 +28,11 @@ enum STORAGE_COMMAND
 };
 
 extern uint8_t storage_ext_patches_done;
+extern int vsh_type;
+
+#ifdef DO_PATCH_PS2
+void copy_emus(int emu_type);
+#endif
 
 void storage_ext_init(void);
 void storage_ext_patches(void);

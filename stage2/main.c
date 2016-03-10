@@ -2,7 +2,7 @@
  'Mamba' is the payload version of Cobra code CFW (developed by Cobra Team) for Iris Manager
  and updated by NzV to work without Iris (sky) payload (also autoboot features)
  
- PS2 ISO support added by Ps3ita Team
+ PS2 and PSP ISO support added by Ps3ita Team
 
  LICENSED under GPL v3.0
 
@@ -29,6 +29,7 @@
 #include "modulespatch.h"
 #include "mappath.h"
 #include "storage_ext.h"
+#include "psp.h"
 #include "config.h"
 #include "syscall8.h"
 #include "region.h"
@@ -44,7 +45,7 @@
 #define IS_CFW			1
 
 #define MAMBA_VERSION		0x0F
-#define MAMBA_VERSION_BCD	0x0720
+#define MAMBA_VERSION_BCD	0x0730
 
 // Format of version:
 // byte 0, 7 MS bits -> reserved
@@ -239,6 +240,7 @@ LV2_SYSCALL2(void, sys_cfw_poke, (uint64_t *ptr, uint64_t value))
 			}
 		}
 	}
+
 	else if (addr == MKA(open_path_symbol))
 	{
 
@@ -366,7 +368,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 
 	extend_kstack(0);
 
-	#ifdef DEBUG
+	#ifdef PS3ITA
 	DPRINTF("Syscall 8 -> %lx\n", function);
 	#endif
 
@@ -384,11 +386,12 @@ if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
 	// --
 
 	// Some processsing to avoid crashes with lv1 dumpers
+
 	pid = get_current_process_critical()->pid;
 
 	if (pid == pid_blocked)
 	{
-		if (function <= 0x1000 ||function >= 0x9800 || (function & 3)) /* Keep all cobra opcodes below 0x9800 */
+		if (function <= 0x1000 ||function >= 0x9800 || (function & 3)) // Keep all cobra opcodes below 0x9800 //
 		{
 			#ifdef ENABLE_LOG
 			WriteToLog("App was unblocked from using syscall8\n");
@@ -419,12 +422,15 @@ if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
 		pid_blocked = pid;
 		return ENOSYS;
 	}
+	
+	#ifdef DO_PATCH_PSP
 	else if (function == (SYSCALL8_OPCODE_PSP_POST_SAVEDATA_INITSTART-8))
 	{
 		// 0x3000, On 0x3008 it *could* crash
 		pid_blocked = pid;
 		return ENOSYS;
 	}
+	#endif
 
 	#ifdef PS3M_API
 	if (3 <= ps3mapi_partial_disable_syscall8)
@@ -681,11 +687,11 @@ if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
 		case SYSCALL8_OPCODE_MOUNT_PSX_DISCFILE:
 			return sys_storage_ext_mount_psx_discfile((char *)param1, param2, (ScsiTrackDescriptor *)param3);
 		break;
-#ifdef DO_PATCH_PS2
+		#ifdef DO_PATCH_PS2
 		case SYSCALL8_OPCODE_MOUNT_PS2_DISCFILE:
 			return sys_storage_ext_mount_ps2_discfile(param1, (char **)param2, param3, (ScsiTrackDescriptor *)param4);
 		break;
-#endif
+		#endif
 		case SYSCALL8_OPCODE_MOUNT_DISCFILE_PROXY:
 			return sys_storage_ext_mount_discfile_proxy(param1, param2, param3, param4, param5, param6, (ScsiTrackDescriptor *)param7);
 		break;
@@ -717,16 +723,41 @@ if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0)
 		case SYSCALL8_OPCODE_REMOVE_ACCESS:
 			return 0;//needed for mmCM
 		break;
-
-		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
+		#ifdef DO_PATCH_PSP
 		case SYSCALL8_OPCODE_SET_PSP_UMDFILE:
+			return sys_psp_set_umdfile((char *)param1, (char *)param2, param3);
+		break;
+
 		case SYSCALL8_OPCODE_SET_PSP_DECRYPT_OPTIONS:
+			return sys_psp_set_decrypt_options(param1, param2, (uint8_t *)param3, param4, param5, (uint8_t *)param6, param7);
+		break;
+
 		case SYSCALL8_OPCODE_READ_PSP_HEADER:
+			return sys_psp_read_header(param1, (char *)param2, param3, (uint64_t *)param4);
+		break;
+
 		case SYSCALL8_OPCODE_READ_PSP_UMD:
+			return sys_psp_read_umd(param1, (void *)param2, param3, param4, param5);
+		break;
+
 		case SYSCALL8_OPCODE_PSP_PRX_PATCH:
+			return sys_psp_prx_patch((uint32_t *)param1, (uint8_t *)param2, (void *)param3);
+		break;
+
 		case SYSCALL8_OPCODE_PSP_CHANGE_EMU:
+			return sys_psp_set_emu_path((char *)param1);
+		break;
+
 		case SYSCALL8_OPCODE_PSP_POST_SAVEDATA_INITSTART:
+			return sys_psp_post_savedata_initstart(param1, (void *)param2);
+		break;
+
 		case SYSCALL8_OPCODE_PSP_POST_SAVEDATA_SHUTDOWNSTART:
+			return sys_psp_post_savedata_shutdownstart();
+		break;
+		#endif
+		
+		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
 		case SYSCALL8_OPCODE_DRM_GET_DATA:
 		case SYSCALL8_OPCODE_SEND_POWEROFF_EVENT:
 		case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
@@ -831,7 +862,7 @@ static INLINE void apply_kernel_patches(void)
 int vsh_type = 0x666;
 
 //Only rebug 
-void get_rebug_vsh()
+static INLINE void get_rebug_vsh()
 {
 	CellFsStat stat;
 	
@@ -847,43 +878,12 @@ void get_rebug_vsh()
 	#endif
 }
 
-#ifdef DO_PATCH_PS2
-int ps2_patches_done = 0;
+uint64_t vsh_offset = 0;
 
-static INLINE void ps2_vsh_patches()
-{	
-	if(condition_ps2softemu == 0 || ps2_patches_done)
-		return;
+static INLINE int get_vsh_offset()
+{
+	int i;
 	
-	ps2_patches_done = 1; //not needed.. anyway..
-	
-	uint64_t ps2tonet = ps2tonet_patch, ps2tonet_size = ps2tonet_size_patch;
-	uint64_t vsh_offset = 0;
-	uint64_t value = 0, addr = 0, addr2 = 0, mv_offset = 0;
-	int i, z;
-	
-	if(vsh_type == 0xCE)
-	{
-		//REBUG REX lv2 DEX and vsh CEX
-		#ifdef cex_ps2tonet_patch
-		ps2tonet = cex_ps2tonet_patch;
-		#endif
-		#ifdef cex_ps2tonet_size_patch
-		ps2tonet_size = cex_ps2tonet_size_patch;
-		#endif
-	}
-	else if(vsh_type == 0xDE)
-	{
-		//REBUG REX lv2 CEX and vsh DEX
-		#ifdef dex_ps2tonet_patch
-		ps2tonet = dex_ps2tonet_patch;
-		#endif
-		#ifdef dex_ps2tonet_size_patch
-		ps2tonet_size = dex_ps2tonet_size_patch;
-		#endif
-	}
-		
-	//Find vsh position and size
 	//First try with static offset..
 	if(lv1_peekd(vsh_pos_in_ram + 0x200) == 0xF821FF917C0802A6ULL)
 	{
@@ -892,9 +892,8 @@ static INLINE void ps2_vsh_patches()
 			if(lv1_peekd(vsh_pos_in_ram + 0x210) == 0x6000000048000405ULL)
 			{
 				vsh_offset = vsh_pos_in_ram;
-				vsh_size = lv1_peekd(vsh_offset + 0x28);
 				#ifdef DEBUG
-				DPRINTF("Vsh.self found with static offset at address 0x%lx, size 0x%lx\n", vsh_offset, vsh_size);
+				DPRINTF("Vsh.self found with static offset at address 0x%lx\n", vsh_offset);
 				#endif
 			}
 		}
@@ -902,7 +901,7 @@ static INLINE void ps2_vsh_patches()
 	//..if that not work brute-force the address
 	else
 	{
-		for(i = 0x10000; i < 0x1000000; i += 0x10000)
+		for(i = 0x10000; i < 0x3000000; i += 0x10000)
 		{
 			if(lv1_peekd(i + 0x200) == 0xF821FF917C0802A6ULL)
 			{
@@ -926,7 +925,47 @@ static INLINE void ps2_vsh_patches()
 		#ifdef DEBUG
 		DPRINTF("Vsh.self not found!!\n");
 		#endif
-		return;
+		return -1;
+	}
+	
+	return 0;
+}
+
+
+#ifdef DO_PATCH_PS2
+int ps2_patches_done = 0;
+
+static INLINE int ps2_vsh_patches()
+{	
+	if(condition_ps2softemu == 0)
+		return 0;
+		
+	if(vsh_offset == 0)
+		return EINVAL;
+
+	uint64_t ps2tonet = ps2tonet_patch, ps2tonet_size = ps2tonet_size_patch;
+	uint64_t value = 0, addr = 0, addr2 = 0;
+	int i = 0, mv_offset = 0;
+	
+	if(vsh_type == 0xCE)
+	{
+		//REBUG REX lv2 DEX and vsh CEX
+		#ifdef cex_ps2tonet_patch
+		ps2tonet = cex_ps2tonet_patch;
+		#endif
+		#ifdef cex_ps2tonet_size_patch
+		ps2tonet_size = cex_ps2tonet_size_patch;
+		#endif
+	}
+	else if(vsh_type == 0xDE)
+	{
+		//REBUG REX lv2 CEX and vsh DEX
+		#ifdef dex_ps2tonet_patch
+		ps2tonet = dex_ps2tonet_patch;
+		#endif
+		#ifdef dex_ps2tonet_size_patch
+		ps2tonet_size = dex_ps2tonet_size_patch;
+		#endif
 	}
 	
 	//Find ps2tonet_patch patches
@@ -934,7 +973,7 @@ static INLINE void ps2_vsh_patches()
 	addr = (vsh_offset + ps2tonet_size);
 	addr2 = (vsh_offset + ps2tonet);
 
-	for(i = 0; i < 3; i++)
+	for(mv_offset = 0; mv_offset < 0x2000000; mv_offset += 0x100000)
 	{
 		value = lv1_peekd(addr + mv_offset);
 		if(value == 0x3800004078640020ULL)
@@ -944,7 +983,7 @@ static INLINE void ps2_vsh_patches()
 				#ifdef DEBUG
 				DPRINTF("Ps2tonet patches are always there, nothing to do!\n");
 				#endif
-				return;
+				return 0;
 			}
 		}
 		else if(value == 0x38A004F078640020ULL)
@@ -966,62 +1005,55 @@ static INLINE void ps2_vsh_patches()
 				DPRINTF("Second poke: 0x%lx\n", value);
 				DPRINTF("SUCCESS: all patches DONE!\n");
 				#endif
-				return;
+				return 0;
 			}
 		}
-		if(i == 0)
-			mv_offset = 0x500000;
-		//Sometimes after a reboot to LPAR1 the vsh is truncate in two pieces and the offset of ps2tonet_patch is moved of 0x1500000 bytes instead of 0x500000 bytes
-		if(i == 1)
-			mv_offset = 0x1500000;
 	}
 	
-	vsh_offset += 0x700;
+	//brute-force
+	mv_offset = (vsh_offset + 0x700);
 	
-	//brute-force the address
-	for(z = 0; z < 2; z++)
+	for(i = 0; i < 0x2000000; i += 4)
 	{
-		for(i = 0; i < 0x1000000; i += 4)
-		{
-			if(lv1_peekd(vsh_offset + i) == 0x3860000060638202ULL)
-			{	
-				addr = (vsh_offset + i + 4);		
+		if(lv1_peekd(mv_offset + i) == 0x3860000060638202ULL)
+		{	
+			addr = (mv_offset + i + 4);		
+			#ifdef DEBUG
+			DPRINTF("Offset ps2tonet_patch found with brute-force at address 0x%lx\n", addr);
+			#endif
+			
+			addr2 = (addr - 12);
+			if(lv1_peekd(addr2) == 0x38A004F078640020ULL)
+			{
 				#ifdef DEBUG
-				DPRINTF("Offset ps2tonet_patch found with brute-force at address 0x%lx\n", addr);
+				DPRINTF("Offset ps2tonet_size_patch found with brute-force at address 0x%lx\n", addr2);
 				#endif
-				
-				addr2 = (addr - 12);
-				if(lv1_peekd(addr2) == 0x38A004F078640020ULL)
-				{
-					#ifdef DEBUG
-					DPRINTF("Offset ps2tonet_size_patch found with brute-force at address 0x%lx\n", addr2);
-					#endif
 						
-					lv1_pokew(addr, ORI(R3, R3, 0x8204));
-					lv1_pokew(addr2, LI(R5, 0x40));
+				lv1_pokew(addr, ORI(R3, R3, 0x8204));
+				lv1_pokew(addr2, LI(R5, 0x40));
 						
-					#ifdef DEBUG
-					value = lv1_peekw(addr);
-					DPRINTF("First poke: 0x%lx\n", value);
-					value = lv1_peekw(addr2);
-					DPRINTF("Second poke: 0x%lx\n", value);
-					DPRINTF("SUCCESS: all patches DONE!\n");
-					#endif
-					return;
-				}
-				else
-				{
-					#ifdef DEBUG
-					DPRINTF("WARNING: ps2tonet_size_patch not found!!\n");
-					#endif
-				}
+				#ifdef DEBUG
+				value = lv1_peekw(addr);
+				DPRINTF("First poke: 0x%lx\n", value);
+				value = lv1_peekw(addr2);
+				DPRINTF("Second poke: 0x%lx\n", value);
+				DPRINTF("SUCCESS: all ps2tonet patches DONE!\n");
+				#endif
+				return 0;
+			}
+			else
+			{
+				#ifdef DEBUG
+				DPRINTF("WARNING: ps2tonet_size_patch not found!!\n");
+				#endif
 			}
 		}
-		vsh_offset = 0x2000000;
 	}
+	
 	#ifdef DEBUG
 	DPRINTF("WARNING: ps2tonet patches not found!!\n");
 	#endif
+	return EINVAL;
 }
 
 #endif
@@ -1045,6 +1077,7 @@ int main(void)
 	#endif
 	
 	get_rebug_vsh();
+	get_vsh_offset();
 
 	if (!vsh_process) vsh_process = get_vsh_process(); //NzV
     storage_ext_init();

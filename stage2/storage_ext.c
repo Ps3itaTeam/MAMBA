@@ -2192,8 +2192,6 @@ static INLINE int get_psx_video_mode(void)
 	return ret;
 }
 
-extern int vsh_type;
-
 static INLINE void do_video_mode_patch(void)
 {
 	uint64_t vm_patch_off = vmode_patch_offset;
@@ -2551,6 +2549,9 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 	if (!hdd0_mounted && strcmp(mount_point, "/dev_hdd0") == 0 && strcmp(filesystem, "CELL_FS_UFS") == 0)
 	{
 		hdd0_mounted = 1;
+		#ifdef DO_PATCH_PS2
+		copy_emus(ps2emu_type);
+		#endif
 		read_mamba_config();
 		mutex_lock(mutex, 0);
 		if (real_disctype == 0)
@@ -2632,20 +2633,57 @@ static INLINE void load_ps2emu_stage2(int emu_type)
 	
 	page_free(NULL, buf, 0x2F);
 }
+
+void copy_emus(int emu_type)
+{
+	char name[64];
+	int src, dst;
+	uint8_t *buf;
+
+	if (emu_type < 0 || emu_type > PS2EMU_GX)
+		return;
+
+	page_allocate_auto(NULL, 0x10000, 0x2F, (void **)&buf);
+
+	sprintf(name, "/dev_flash/ps2emu/%s", ps2emu_stage2[emu_type]);
+
+	if (cellFsOpen(name, CELL_FS_O_RDONLY, &src, 0, NULL, 0) == 0)
+	{
+		uint64_t size;
+
+		cellFsRead(src, buf, 0x10000, &size);
+		cellFsClose(src);
+
+		if (cellFsOpen(PS2EMU_STAGE2_FILE, CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
+		{
+			cellFsWrite(dst, buf, size, &size);
+			cellFsClose(dst);
+		}
+	}
+	#ifdef DEBUG
+	else
+	{
+		DPRINTF("Failed to open ps2 stage2: %s\n", name);
+	}
+	#endif
+
+	page_free(NULL, buf, 0x2F);
+}
+
 static void build_netemu_params(uint8_t *ps2_soft, uint8_t *ps2_net)
 {
-	int fd = -1;
+	int fd;
 	uint64_t written;
 
-	// First take care of sm arguments
+	//First take care of sm arguments
 	memset(ps2_net, 0, 0x40);
 	memcpy(ps2_net, ps2_soft, 8);
 	ps2_net[8] = 3;
 	strcpy((char *)ps2_net + 9, "--COBRA--");
 	memcpy(ps2_net+0x2A, ps2_soft+0x118, 6);
 
-	// Now ps2bootparam
-	if (cellFsOpen("/dev_hdd0/tmp/game/ps2bootparam.dat", CELL_FS_O_WRONLY|CELL_FS_O_CREAT|CELL_FS_O_TRUNC, &fd, 0666, NULL, 0) != 0)
+	//Now ps2bootparam
+	if (cellFsOpen("/dev_hdd0/tmp/game/ps2bootparam.dat", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &fd, 0666, NULL, 0) != 0)
 	{
 		#ifdef DEBUG
 		DPRINTF("Cannot open ps2bootparam.dat\n");
@@ -2653,11 +2691,35 @@ static void build_netemu_params(uint8_t *ps2_soft, uint8_t *ps2_net)
 		return;
 	}
 
-	// netemu ps2bootparam.dat has a format very similar to softemu sm arguments
-	ps2_soft[11] = 3;
-	strcpy((char *)ps2_soft+12, "--COBRA--");
+	uint64_t static_one={0x054c026840000000};
+	uint64_t static_two={0x3600043504082225};
 
-	cellFsWrite(fd, ps2_soft, 0x4F0, &written);
+	//netemu ps2bootparam.dat has a format very similar to softemu sm arguments
+	ps2_soft[11] = 3;
+	ps2_soft[0x4d0] = 8;
+	ps2_soft[0x4d7] = 6;
+	strcpy((char *)ps2_soft+12, "--COBRA--");
+	memset(ps2_soft+0x4f0, 0, 0x2204);
+	int controller_count=0;
+
+	//patch controllers
+	uint64_t controller, offset;
+	for(uint32_t i = 0; i < 11; i++)
+	{
+		memcpy(&controller, ps2_soft + 0x98 + (8*i), 8);
+		if(controller)
+		{
+			offset = (0x218*i);
+			memcpy(ps2_soft+offset+0x4f4, &controller, 8);
+			memcpy(ps2_soft+offset+0x4f4+0x8, &static_one, 8);
+			ps2_soft[offset+0x515]=9;
+			memcpy(ps2_soft+offset+0x516, &static_two, 8);
+			controller_count++;
+		}
+	}
+
+	ps2_soft[0x4f3] = controller_count;
+	cellFsWrite(fd, ps2_soft, 0x26f4, &written);
 
 	// netemu has a 0x4F0-0x773 section where custom memory card is, but we dont need it,
 	// Not writing it + a patch in netemu forces the emu to use the internal ones like BC consoles
@@ -2692,46 +2754,44 @@ LV2_HOOKED_FUNCTION(int, shutdown_copy_params_patched, (uint8_t *argp_user, uint
 
 		// We need to check first if this a NPDRM or a plain iso launched from disc icon
 		// Discard first the case of BC consoles, since the ps2tonet patch is not done there
-		if (ps2emu_type == PS2EMU_SW)
+		if (argp[12] == 0) /* if vsh prepared the arguments for ps2_softemu */
 		{
-			if (argp[12] == 0) /* if vsh prepared the arguments for ps2_softemu */
+			if (disc_emulation == EMU_OFF)
 			{
-				if (disc_emulation == EMU_OFF)
+				// If optical disc, let's just panic
+				if (effective_disctype == DEVICE_TYPE_PS2_CD || effective_disctype == DEVICE_TYPE_PS2_DVD)
 				{
-					// If optical disc, let's just panic
-					if (effective_disctype == DEVICE_TYPE_PS2_CD || effective_disctype == DEVICE_TYPE_PS2_DVD)
-					{
-						fatal("Sorry, no optical disc support in ps2_netemu\n");
-					}
-					else
-					{
-						// We should be never here "naturally" (a hb could still force this situation)
-						// Well, maybe if the user quckly removed a ps2 disc...
-					}
-				}
-				else if (disc_emulation == EMU_PS2_CD || disc_emulation == EMU_PS2_DVD)
-				{
-					prepare_ps2emu = 1;
-					build_netemu_params(get_secure_user_ptr(argp_user), argp);
+					fatal("Sorry, no optical disc support in ps2_netemu\n");
 				}
 				else
 				{
 					// We should be never here "naturally" (a hb could still force this situation)
+					// Well, maybe if the user quckly removed a ps2 disc...
 				}
+			}
+			else if (disc_emulation == EMU_PS2_CD || disc_emulation == EMU_PS2_DVD)
+			{
+				prepare_ps2emu = 1;
+				build_netemu_params(get_secure_user_ptr(argp_user), argp);
 			}
 			else
 			{
-				cellFsUnlink(PS2EMU_CONFIG_FILE);
-				if (disc_emulation == EMU_PS2_CD || disc_emulation == EMU_PS2_DVD)
-				{
+				// We should be never here "naturally" (a hb could still force this situation)
+			}
+		}
+		else
+		{
+			cellFsUnlink(PS2EMU_CONFIG_FILE);
+			if (disc_emulation == EMU_PS2_CD || disc_emulation == EMU_PS2_DVD)
+			{
 				
-					prepare_ps2emu = 1; 
-				}
-				else
-				{
-					DPRINTF("NPDRM game, skipping ps2emu preparation\n");
-				}
-
+				prepare_ps2emu = 1; 
+			}
+			else
+			{
+				#ifdef DEBUG
+				DPRINTF("NPDRM game, skipping ps2emu preparation\n");
+				#endif
 			}
 		}
 	}
@@ -3597,7 +3657,7 @@ static INLINE void patch_ps2emu_entry(int ps2emu_type)
 	// Patch needed to support PS2 CD-R(W) and DVD+-R(W). Not necessary for isos.
 	// Needed but not enough: patches at ps2 emus are necessary too!
 	// Patch address may be different in different models
-	for (u64 search_addr = 0x100000; search_addr < 0x300000; search_addr += 4)
+	for (u64 search_addr = 0x160000; search_addr < 0x300000; search_addr += 4)
 	{
 		if (lv1_peekd(search_addr) == 0x409E00702FBE0001)
 		{
