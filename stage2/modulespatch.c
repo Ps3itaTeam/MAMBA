@@ -139,7 +139,7 @@ static char *hash_to_name(uint64_t trunc_hash)
 		return "basic_plugins.sprx";
 	#ifdef BASIC_PLUGINS_REBUG_HASH
 	else if(trunc_hash == (BASIC_PLUGINS_REBUG_HASH >> 16))
-		return "[Rebug] basic_plugins.sprx";
+		return "basic_plugins.sprx";
 	#endif
 #endif
 #ifdef DO_PATCH_PS2
@@ -151,15 +151,15 @@ static char *hash_to_name(uint64_t trunc_hash)
 		return "game_ext_plugin.sprx";
 	#ifdef EXPLORE_PLUGIN_REBUG_HASH
 	else if(trunc_hash == (EXPLORE_PLUGIN_REBUG_HASH >> 16))
-		return "[Rebug] explore_plugin.sprx";
+		return "explore_plugin.sprx";
 	#endif
 	#ifdef EXPLORE_CATEGORY_GAME_REBUG_HASH
 	else if(trunc_hash == (EXPLORE_CATEGORY_GAME_REBUG_HASH >> 16))
-		return "[Rebug] explore_category_game.sprx";
+		return "explore_category_game.sprx";
 	#endif
 	#ifdef GAME_EXT_PLUGIN_REBUG_HASH
 	else if(trunc_hash == (GAME_EXT_PLUGIN_REBUG_HASH >> 16))
-		return "[Rebug] game_ext_plugin.sprx";
+		return "game_ext_plugin.sprx";
 	#endif
 #endif
 	return "UNKNOWN";
@@ -189,27 +189,35 @@ SprxPatch game_ext_plugin_patches[] =
 };
 
 //REBUG REX
-#ifdef dex_ps2_nonbw_offset
 SprxPatch rebug_explore_plugin_patches[] =
 {
+	#ifdef dex_ps2_nonbw_offset
 	{ dex_ps2_nonbw_offset, LI(0, 1), &condition_ps2softemu },
+	#else
+	{ ps2_nonbw_offset, LI(0, 1), &condition_ps2softemu },
+	#endif
 	{ 0 }
 };
-#endif
-#ifdef dex_ps2_nonbw_offset2
+
 SprxPatch rebug_explore_category_game_patches[] =
 {
+	#ifdef dex_ps2_nonbw_offset2
 	{ dex_ps2_nonbw_offset2, LI(R0, 1), &condition_ps2softemu },
+	#else
+	{ ps2_nonbw_offset2, LI(R0, 1), &condition_ps2softemu },
+	#endif
 	{ 0 }
 };
-#endif
-#ifdef dex_ps2_nonbw_offset3
+
 SprxPatch rebug_game_ext_plugin_patches[] =
 {
+	#ifdef dex_ps2_nonbw_offset3
 	{ dex_ps2_nonbw_offset3, LI(R0, 1), &condition_ps2softemu },
+	#else
+	{ ps2_nonbw_offset3, LI(R0, 1), &condition_ps2softemu },
+	#endif
 	{ 0 }
 };
-#endif
 #endif
 
 #ifdef DO_PATCH_PSP
@@ -591,8 +599,10 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 		}
 		#endif
 		
+		
 		if(vsh_type != 0x666)
-			*patch_table = *patch_table_rebug;
+			memcpy(patch_table, patch_table_rebug, sizeof(patch_table));
+		
 		
 		for (int i = 0; i < N_PATCH_TABLE_ENTRIES; i++)
 		{		
