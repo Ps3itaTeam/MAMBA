@@ -81,9 +81,9 @@ static INLINE void psp_patches_type()
 		psp_drm_patches[7].offset = cex_psp_drm_patchD;
 		psp_drm_patches[8].offset = cex_psp_drm_patchE;
 		psp_drm_patches[9].offset = cex_psp_drm_patchF;
+		#endif
 		#ifdef cex_psp_extra_drm_patch //in cfw rebug the patch is harcoded in the vsh, anyway.. 
 		psp_extra_drm_fix = cex_psp_extra_drm_patch;
-		#endif
 		#endif
 	}
 	else if(vsh_type == 0xDE)

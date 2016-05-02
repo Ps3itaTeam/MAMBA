@@ -53,6 +53,7 @@ if exist mamba_4_76.lz.bin     move  mamba_4_76.lz.bin     mamba\mamba_476C.lz.b
 if exist mamba_4_76DEX.lz.bin  move  mamba_4_76DEX.lz.bin  mamba\mamba_476D.lz.bin>nul
 if exist mamba_4_78.lz.bin     move  mamba_4_78.lz.bin     mamba\mamba_478C.lz.bin>nul
 if exist mamba_4_78DEX.lz.bin  move  mamba_4_78DEX.lz.bin  mamba\mamba_478D.lz.bin>nul
+if exist mamba_4_80.lz.bin     move  mamba_4_80.lz.bin     mamba\mamba_480C.lz.bin>nul
 
 if not exist mamba\bin mkdir mamba\bin
 
@@ -88,6 +89,7 @@ if exist mamba_4_76.bin     move  mamba_4_76.bin  	 mamba\bin\mamba_476C.bin>nul
 if exist mamba_4_76DEX.bin  move  mamba_4_76DEX.bin  mamba\bin\mamba_476D.bin>nul
 if exist mamba_4_78.bin     move  mamba_4_78.bin  	 mamba\bin\mamba_478C.bin>nul
 if exist mamba_4_78DEX.bin  move  mamba_4_78DEX.bin  mamba\bin\mamba_478D.bin>nul
+if exist mamba_4_80.bin     move  mamba_4_80.bin  	 mamba\bin\mamba_480C.bin>nul
 del *.bin>nul
 
 pause

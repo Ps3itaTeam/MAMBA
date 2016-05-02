@@ -65,4 +65,6 @@ all:
 	make -f Makefile_4.78 --no-print-directory
 	make -f Makefile_4.78D clean --no-print-directory
 	make -f Makefile_4.78D --no-print-directory
+	make -f Makefile_4.80 clean --no-print-directory
+	make -f Makefile_4.80 --no-print-directory
 	rm -f *.o *.elf stage2/*.map stage2/*.o lv2/src/*.o lv1/src/*.o debug/src/*.o

@@ -107,10 +107,10 @@
 #define process_rtoc_entry_1                        -0x77C0
 #define patch_func2                                 0x7A7C4
 #define patch_func2_offset                          0x2C
-#define user_thread_prio_patch              0x20140
-#define user_thread_prio_patch2             0x2014C
-#define shutdown_copy_params_call         0x9940
-#define shutdown_patch_offset            0x992C
+#define user_thread_prio_patch              		0x20140
+#define user_thread_prio_patch2             		0x2014C
+#define shutdown_copy_params_call         			0x9940
+#define shutdown_patch_offset            			0x992C
 #elif defined(FIRMWARE_3_55DEX) // Ported by Joonie, Big thanks to @aldostools for his amazing tool, special thanks to @Estwald
 #define TOC                                         0x34AC80 //done
 #define open_shared_kernel_object_symbol            0x1288C // bytes matched: 0x80  F821FF317C0802A6FB8100B0FBC100C0FBE100C8F80100E0789C84027CE03B78
@@ -3057,6 +3057,117 @@
 #define patch_func2_offset 							0x2C
 #define shutdown_copy_params_call					0xAB4C
 #define shutdown_patch_offset						0xAB38
+#elif defined(FIRMWARE_4_80) // Ported by Joonie
+#define TOC											0x34FBA0 //done
+#define open_kernel_object_symbol					0x125FC // 
+#define open_shared_kernel_object_symbol			0x1240C // 
+#define close_kernel_object_handle_symbol			0x11A2C // 
+#define alloc_symbol								0x64820 // 
+#define dealloc_symbol								0x64C5C // 
+#define copy_to_user_symbol							0xF868 // 
+#define copy_from_user_symbol						0xFA84 // 
+#define copy_to_process_symbol						0xF920 // 
+#define copy_from_process_symbol					0xF730 // 
+#define page_allocate_symbol						0x60390 // 
+#define page_free_symbol							0x5FDF4 // 
+#define page_export_to_proc_symbol					0x6052C // 
+#define page_unexport_from_proc_symbol		        0x5FCE8 // 
+#define kernel_ea_to_lpar_addr_symbol				0x70148 // 
+#define process_ea_to_lpar_addr_ex_symbol			0x7775C // 
+#define set_pte_symbol                              0x5E38C // 
+#define map_process_memory_symbol					0x77268 // 
+#define memcpy_symbol								0x7E928 // 
+#define memset_symbol								0x4D668 // 
+#define memcmp_symbol								0x4C978 // 
+#define printf_symbol								0x2706A0 // Confirmed
+#define printfnull_symbol							0x275114 // Confirmed
+#define sprintf_symbol								0x4EA90 // 
+#define snprintf_symbol								0x4E9FC // 
+#define strcpy_symbol								0x4D814 // 
+#define strncpy_symbol								0x4D8DC // 
+#define strlen_symbol								0x4D83C // 
+#define strcat_symbol								0x4D744 // 
+#define strcmp_symbol								0x4D7C0 // 
+#define strncmp_symbol								0x4D868 // 
+#define strchr_symbol								0x4D77C // 
+#define spin_lock_irqsave_ex_symbol					0x26D78C // Confirmed 
+#define spin_unlock_irqrestore_ex_symbol			0x26D760 // Confirmed
+#define load_process_symbol							0x5004 // 
+#define ppu_thread_create_symbol					0x13EC4 // 
+#define ppu_thread_exit_symbol						0x13F7C // 
+#define ppu_thread_join_symbol						0x13FD0 // 
+#define ppu_thread_delay_symbol						0x287A0 // 
+#define create_user_thread2_symbol					0x2507C // 
+#define start_thread_symbol							0x23D48 // 
+#define run_thread_symbol							0x23578 // 
+#define register_thread_symbol						0x267940 // Confirmed
+#define allocate_user_stack_symbol					0x268128 // Confirmed
+#define mutex_create_symbol							0x13638 //
+#define mutex_destroy_symbol						0x135D0 // 
+#define mutex_lock_symbol							0x135C8 //
+#define mutex_unlock_symbol							0x135C0 // 
+#define event_port_create_symbol					0x13074 // 
+#define event_port_destroy_symbol					0x134DC // 
+#define event_port_connect_symbol					0x13554 // 
+#define event_port_disconnect_symbol				0x13480 // 
+#define event_port_send_symbol						0x1306C // 
+#define event_queue_create_symbol					0x1337C // 
+#define event_queue_destroy_symbol					0x13304 // 
+#define event_queue_receive_symbol					0x13148 // 
+#define cellFsOpen_symbol							0x2978F4 // Confirmed
+#define cellFsClose_symbol							0x29775C // Confirmed
+#define cellFsRead_symbol							0x297898 // Confirmed
+#define cellFsWrite_symbol							0x297804 // Confirmed
+#define cellFsLseek_symbol							0x296E8C // Confirmed
+#define cellFsStat_symbol							0x297110 // Confirmed
+#define cellFsUnlink_internal_symbol				0x19C644 // Confrimed
+#define cellFsUtilMount_symbol						0x296C6C // Confirmed
+#define cellFsUtilUmount_symbol 					0x296C40 // Confirmed
+#define pathdup_from_user_symbol					0x29C8D8 // Confirmed
+#define	open_path_symbol							0x29762C  // Confirmed
+#define open_fs_object_symbol						0x18A968 // Confirmed
+#define close_fs_object_symbol						0x1898A4 // Confirmed
+#define storage_get_device_info_symbol				0x279AF4 // Done
+#define storage_open_symbol							0x279504 // Done
+#define storage_close_symbol						0x2792F4 // Done
+#define storage_read_symbol							0x278864 // Done
+#define storage_send_device_command_symbol			0x2783F0 // Done
+#define storage_map_io_memory_symbol				0x2799B0 // Done
+#define storage_unmap_io_memory_symbol		        0x27987C //
+#define storage_internal_get_device_object_symbol	0x277EA8 // Done
+#define decrypt_func_symbol							0x3496C //
+#define lv1_call_99_wrapper_symbol					0x4EEA4 // 
+#define modules_verification_symbol					0x58AB4 // 
+#define prx_load_module_symbol						0x88C00 // 
+#define prx_start_module_symbol						0x878CC // 
+#define prx_stop_module_symbol						0x88CA4 // 
+#define prx_unload_module_symbol					0x87600 // 
+#define prx_get_module_info_symbol					0x87088 //  
+#define prx_get_module_list_symbol					0x87108 // 
+#define extend_kstack_symbol						0x700A0 //
+#define get_pseudo_random_number_symbol				0x228178 // 
+#define syscall_table_symbol						0x363BE0 //done
+#define syscall_call_offset							0x275BF8 //
+#define read_bdvd0_symbol							0x1A4614 // 
+#define read_bdvd1_symbol							0x1A6240 // 
+#define read_bdvd2_symbol							0x1B33F8 // 
+#define device_event_port_send_call					0x282060 //
+#define process_map_caller_call						0x4D24 // 
+#define fsloop_open_call							0x297A8C //
+#define fsloop_close_call							0x297ADC // 
+#define fsloop_read_call							0x297B1C // 
+#define io_rtoc_entry_1								0x25B8 //found at 0x299A82 25B8E97E8038EBC1FFF0F9630000
+#define io_sub_rtoc_entry_1							-0x7EA0 //found at 0x164B7E 8160E97E8168EB9E8140EBBE8170
+#define decrypt_rtoc_entry_2 						-0x66A0 //found at 0x598AE 99604BFFBC25392000004BFFFFCC2C2400007C0802A6
+#define storage_rtoc_entry_1						0x1DD8 //found at 0x277F76 1DD87C0802A6F821FF51F80100C0FBE100A87C9F23
+#define device_event_rtoc_entry_1					0x2048 //found at 0x28204A 204878050620E8CA00387D052B78E92B0000
+#define process_rtoc_entry_1						-0x7800 //found at 0x1A152 88003FC0800163DE0005E87D0000
+#define user_thread_prio_patch						0x203F8 // 
+#define user_thread_prio_patch2						0x20404 //
+#define patch_func2 								0x59D80 // 
+#define patch_func2_offset 							0x2C
+#define shutdown_copy_params_call					0xAACC // 
+#define shutdown_patch_offset						0xAAB8 //
 
 #endif /* FIRMWARE */
 #endif /* __FIRMWARE_SYMBOLS_H_S__ */

@@ -67,6 +67,8 @@
 #define FIRMWARE_VERSION					0x0478
 #elif defined(FIRMWARE_4_78DEX)
 #define FIRMWARE_VERSION					0x0478
+#elif defined(FIRMWARE_4_80)
+#define FIRMWARE_VERSION					0x0480
 #endif
 
 #ifdef DEBUG

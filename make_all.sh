@@ -113,6 +113,9 @@ fi
 if [ -f mamba_4_78DEX.lz.bin ]; then  
 mv mamba_4_78DEX.lz.bin  mamba/mamba_478D.lz.bin
 fi
+if [ -f mamba_4_80.lz.bin ]; then  
+mv mamba_4_80.lz.bin  mamba/mamba_480C.lz.bin
+fi
 
 if [ ! -d mamba/bin ]; then
 mkdir mamba/bin
@@ -219,4 +222,7 @@ mv mamba_4_78.bin  mamba/bin/mamba_478C.bin
 fi
 if [ -f mamba_4_78DEX.bin ]; then  
 mv mamba_4_78DEX.bin  mamba/bin/mamba_478D.bin
+fi
+if [ -f mamba_4_80.bin ]; then  
+mv mamba_4_80.bin  mamba/bin/mamba_480C.bin
 fi
