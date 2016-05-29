@@ -226,3 +226,6 @@ fi
 if [ -f mamba_4_80.bin ]; then  
 mv mamba_4_80.bin  mamba/bin/mamba_480C.bin
 fi
+if [ -f mamba_4_80DEX.bin ]; then  
+mv mamba_4_80DEX.bin  mamba/bin/mamba_480D.bin
+fi

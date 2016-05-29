@@ -101,6 +101,9 @@ static INLINE void psp_patches_type()
 		psp_drm_patches[8].offset = dex_psp_drm_patchE;
 		psp_drm_patches[9].offset = dex_psp_drm_patchF;
 		#endif
+		#ifdef dex_psp_extra_drm_patch //in cfw rebug the patch is harcoded in the vsh, anyway.. 
+		psp_extra_drm_fix = dex_psp_extra_drm_patch;
+		#endif
 	}
 }
 
@@ -129,7 +132,7 @@ static INLINE int get_psp_patches()
 		DPRINTF("Move offset +0x%x\n", mv_offset);
 		#endif
 		
-		//psp_extra_drm_patch fix to 4.75/4.76/4.78 CEX by habib
+		//psp_extra_drm_patch fix to 4.75/4.76/4.78 CEX/DEX by habib
 		if(psp_extra_drm_fix != 0xDEADFACE)
 		{
 			addr = (vsh_offset + psp_extra_drm_fix + mv_offset);

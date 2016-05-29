@@ -2460,6 +2460,7 @@
 #define dex_psp_drm_patchF		0x0
 #define dex_pspemu_path_offset		0x4bbc8
 #define dex_psptrans_path_offset		0x4c830
+#define dex_psp_extra_drm_patch		0x0
 
 #elif defined(FIRMWARE_4_75DEX) 
 
@@ -2493,6 +2494,7 @@
 #define psp_drm_patchD		0x0
 #define psp_drm_patchE		0x0
 #define psp_drm_patchF		0x0
+#define psp_extra_drm_patch		0x0
 
 #define ps2_nonbw_offset       0xDDD8C
 #define ps2_nonbw_offset2		0x68264
@@ -2666,6 +2668,7 @@
 #define dex_psp_drm_patchF		0x0
 #define dex_pspemu_path_offset		0x4bbc8
 #define dex_psptrans_path_offset		0x4c830
+#define dex_psp_extra_drm_patch		0x0
 
 #elif defined(FIRMWARE_4_76DEX) 
 
@@ -2699,6 +2702,7 @@
 #define psp_drm_patchD		0x0 
 #define psp_drm_patchE		0x0
 #define psp_drm_patchF		0x0
+#define psp_extra_drm_patch		0x0
 
 #define ps2_nonbw_offset       0xDDD8C
 #define ps2_nonbw_offset2		0x68264
@@ -2873,6 +2877,7 @@
 #define dex_psp_drm_patchF		0x24AF70
 #define dex_pspemu_path_offset		0x4BBC8
 #define dex_psptrans_path_offset		0x4C830
+#define dex_psp_extra_drm_patch		0x0
 
 #elif defined(FIRMWARE_4_78DEX)
 
@@ -2906,6 +2911,7 @@
 #define psp_drm_patchD		0x24A5A0 // 0x24A0A8 (4.76)   
 #define psp_drm_patchE		0x24A5A4 // 0x24A0AC (4.76)  
 #define psp_drm_patchF		0x24AF70 // 0x24AA78 (4.76)
+#define psp_extra_drm_patch		0x0
 
 #define ps2_nonbw_offset        0xDDDC4
 #define ps2_nonbw_offset2		0x68264
@@ -2976,14 +2982,14 @@
 #elif defined(FIRMWARE_4_80) 
 
 #define EXPLORE_PLUGIN_HASH		0xacf4af2b000ec469
-//#define EXPLORE_PLUGIN_REBUG_HASH	 0xacf4af2b000eccfd		//rebug rex
+#define EXPLORE_PLUGIN_REBUG_HASH	 0xacf4af2b000ecc8a		//rebug rex
 #define EXPLORE_CATEGORY_GAME_HASH	0x9cb378e600056ae5
-//#define EXPLORE_CATEGORY_GAME_REBUG_HASH	0x9cb3396e00056ce1 //rebug rex
+#define EXPLORE_CATEGORY_GAME_REBUG_HASH	0x9cb3396e00056ce9 //rebug rex
 #define GAME_EXT_PLUGIN_HASH		0xe274af7b0001e5c4
-//#define GAME_EXT_PLUGIN_REBUG_HASH		0xe274af7b0001e6e8 //rebug rex
+#define GAME_EXT_PLUGIN_REBUG_HASH		0xe274af7b0001e5db //rebug rex
 #define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
 #define BASIC_PLUGINS_HASH		0xb598277a0001f873
-//#define BASIC_PLUGINS_REBUG_HASH	0xb5988dba00020162 //rebug rex
+#define BASIC_PLUGINS_REBUG_HASH	0xb5988dba00020157 //rebug rex
 #define PSP_EMULATOR_HASH		0x7be641f500023793    
 #define PEMUCORELIB_HASH		0xf349a563000c0d6c
 #define EMULATOR_API_HASH		0xa9f5b37a0001bb45
@@ -2993,22 +2999,22 @@
 
 //WARNING: search this address in RAM!
 //The offset is found with bruteforce if you set it to 0x0 or wrong.
-#define vsh_pos_in_ram			0x930000 //Search in RAM 0xF821FF917C0802A6F80100804800039D or use socat ;)
+#define vsh_pos_in_ram			0x510000 //Search in RAM 0xF821FF917C0802A6F80100804800039D or use socat ;)
 //---------------------//
 /* vsh */
-#define ps2tonet_patch			0x0
-#define ps2tonet_size_patch	    0x0
+#define ps2tonet_patch			0xC4E34
+#define ps2tonet_size_patch	    0xC4E28
 #define vmode_patch_offset		0x4431E4
-#define psp_drm_patch1		0x0
-#define psp_drm_patch2		0x0
-#define psp_drm_patch3		0x0
-#define psp_drm_patch4		0x0
-#define psp_drm_patchA		0x0
-#define psp_drm_patchB		0x0
-#define psp_drm_patchC		0x0
-#define psp_drm_patchD		0x0
-#define psp_drm_patchE		0x0
-#define psp_drm_patchF		0x0
+#define psp_drm_patch1		0x242FBC
+#define psp_drm_patch2		0x243A5C
+#define psp_drm_patch3		0x243698
+#define psp_drm_patch4		0x243EA4
+#define psp_drm_patchA		0x2430D8
+#define psp_drm_patchB		0x243978
+#define psp_drm_patchC		0x242B10
+#define psp_drm_patchD		0x2430C0
+#define psp_drm_patchE		0x2430C4
+#define psp_drm_patchF		0x243A90
 #define psp_extra_drm_patch		0x0
 
 #define ps2_nonbw_offset       0xDD9B4
@@ -3062,24 +3068,125 @@
 #define aio_copy_root_offset		0xD658
 
 //rebug rex
-/*#define dex_ps2_nonbw_offset       0xDDDC4
+#define dex_ps2_nonbw_offset       0xDDDC4
 #define dex_ps2_nonbw_offset2		0x68264
-#define dex_ps2_nonbw_offset3		0x172F4
-#define dex_ps2tonet_patch			0xCA060
-#define dex_ps2tonet_size_patch	    0xCA054
-#define dex_vmode_patch_offset		0x44AA50
-#define dex_psp_drm_patch1		0x24A49C
-#define dex_psp_drm_patch2		0x24AF3C
-#define dex_psp_drm_patch3		0x24AB78
-#define dex_psp_drm_patch4		0x24B384
-#define dex_psp_drm_patchA		0x24A5B8
-#define dex_psp_drm_patchB		0x24AE58
-#define dex_psp_drm_patchC		0x249FF0
-#define dex_psp_drm_patchD		0x24A5A0 
-#define dex_psp_drm_patchE		0x24A5A4 
-#define dex_psp_drm_patchF		0x24AF70
+#define dex_ps2_nonbw_offset3		0x172F0
+#define dex_ps2tonet_patch			0xCA380
+#define dex_ps2tonet_size_patch	    0xCA374
+#define dex_vmode_patch_offset		0x44ADD8
+#define dex_psp_drm_patch1		0x24A7E4
+#define dex_psp_drm_patch2		0x24B284
+#define dex_psp_drm_patch3		0x24AEC0
+#define dex_psp_drm_patch4		0x24B6CC
+#define dex_psp_drm_patchA		0x24A900
+#define dex_psp_drm_patchB		0x24B1A0
+#define dex_psp_drm_patchC		0x24A338
+#define dex_psp_drm_patchD		0x24A8E8 
+#define dex_psp_drm_patchE		0x24A8EC
+#define dex_psp_drm_patchF		0x24B2B8
 #define dex_pspemu_path_offset		0x4BBC8
-#define dex_psptrans_path_offset		0x4C830	*/
+#define dex_psptrans_path_offset	0x4C830
+#define dex_psp_extra_drm_patch		0x0
+
+#elif defined(FIRMWARE_4_80DEX)
+
+#define EXPLORE_PLUGIN_HASH		0xacf4af2b000ecc8a
+#define EXPLORE_CATEGORY_GAME_HASH	0x9cb3396e00056ce9
+#define GAME_EXT_PLUGIN_HASH		0xe274af7b0001e5db
+#define LIBFS_EXTERNAL_HASH			0x5bc7bce800006477
+#define BASIC_PLUGINS_HASH		0xb5988dba00020157
+#define PSP_EMULATOR_HASH		0x7be641f500023793
+#define PEMUCORELIB_HASH		0xf349a563000c0d6c
+#define EMULATOR_API_HASH		0xa9f5b37a0001bb45
+#define EMULATOR_DRM_HASH		0xa324dc4a00005399
+#define EMULATOR_DRM_DATA_HASH		0x75c390860001b75f
+#define LIBSYSUTIL_SAVEDATA_PSP_HASH	0x57bbc3b800003212
+
+//WARNING: search this address in RAM!
+//The offset is found with bruteforce if you set it to 0x0 or wrong.
+#define vsh_pos_in_ram			0x510000 //Search in RAM 0xF821FF917C0802A6F80100804800039D or use socat ;)
+//---------------------//
+/* vsh */
+#define ps2tonet_patch			0xCA380
+#define ps2tonet_size_patch	    0xCA374
+#define vmode_patch_offset		0x44ADD8
+#define psp_drm_patch1		0x24A7E4 // 0x24A49C // 
+#define psp_drm_patch2		0x24B284 // 0x24AF3C // 
+#define psp_drm_patch3		0x24AEC0 // 0x24AB78 // 
+#define psp_drm_patch4		0x24B6CC // 0x24B384 // 
+#define psp_drm_patchA		0x24A900 // 0x24A5B8 // 
+#define psp_drm_patchB		0x24B1A0 // 0x24AE58 // 
+#define psp_drm_patchC		0x24A338 // 0x249FF0 // 
+#define psp_drm_patchD		0x24A8E8 // 0x24A5A0 //   
+#define psp_drm_patchE		0x24A8EC // 0x24A5A4 //   
+#define psp_drm_patchF		0x24B2B8 // 0x24AF70 //  
+#define psp_extra_drm_patch		0x0
+
+#define ps2_nonbw_offset        0xDDDC4
+#define ps2_nonbw_offset2		0x68264
+#define ps2_nonbw_offset3		0x172F4
+
+/* basic_plugins */
+#define pspemu_path_offset		0x4BBC8
+#define psptrans_path_offset		0x4C830
+
+/* psp_emulator */
+#define psp_set_psp_mode_offset 	0x1c18
+
+/* emulator_api */
+#define psp_read			0x102d8
+#define psp_read_header			0x1125c
+#define psp_drm_patch5			0x11080
+#define psp_drm_patch6			0x110b0
+#define psp_drm_patch7			0x110c8
+#define psp_drm_patch8			0x110cc
+#define psp_drm_patch9			0x1120c
+#define psp_drm_patch11			0x11210
+#define psp_drm_patch12			0x11220
+#define psp_product_id_patch1		0x11320
+#define psp_product_id_patch3		0x115f8
+#define umd_mutex_offset		(0x64480+0x38C)
+
+/* pemucorelib */
+#define psp_eboot_dec_patch		0x5e6bc
+#define psp_prx_patch			0x577d8
+#define psp_savedata_bind_patch1	0x7a4bc
+#define psp_savedata_bind_patch2	0x7a514
+#define psp_savedata_bind_patch3	0x7a030
+#define psp_extra_savedata_patch	0x87540
+#define psp_prometheus_patch		0x12ea28
+#define prx_patch_call_lr		0x5892c
+
+/* emulator_drm */
+#define psp_drm_tag_overwrite		0x4c68
+#define psp_drm_key_overwrite		(0x27600-0xBE80)
+
+/* libsysutil_savedata_psp */
+#define psp_savedata_patch1		0x46CC
+#define psp_savedata_patch2		0x46A4
+#define psp_savedata_patch3		0x4504
+#define psp_savedata_patch4		0x453C
+#define psp_savedata_patch5		0x4550
+#define psp_savedata_patch6		0x46B8
+
+/* libfs */
+#define aio_copy_root_offset		0xD658
+
+//rebug rex
+#define cex_ps2tonet_patch			0xC4E34
+#define cex_ps2tonet_size_patch	    0xC4E28 
+#define cex_vmode_patch_offset		0x4431E4
+#define cex_psp_drm_patch1		0x242FBC
+#define cex_psp_drm_patch2		0x243A5C
+#define cex_psp_drm_patch3		0x243698
+#define cex_psp_drm_patch4		0x243EA4
+#define cex_psp_drm_patchA		0x2430D8
+#define cex_psp_drm_patchB		0x243978
+#define cex_psp_drm_patchC		0x242B10
+#define cex_psp_drm_patchD		0x2430C0
+#define cex_psp_drm_patchE		0x2430C4
+#define cex_psp_drm_patchF		0x243A90
+#define cex_psp_extra_drm_patch		0x0
 
 #endif /* FIRMWARE */
 
