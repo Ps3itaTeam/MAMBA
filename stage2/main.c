@@ -864,22 +864,12 @@ int vsh_type = 0x666;
 //Only rebug 
 static INLINE void get_rebug_vsh()
 {
-	uint64_t value = lv1_peekd(0x0ULL);
-	
-	if(value != 0x0ULL) 
-	{
-		vsh_type = (int)value;
-		lv1_poked(0x0ULL, 0x0ULL);;
-	}
-	else 
-	{
-		CellFsStat stat;
+	CellFsStat stat;
 		
-		if(cellFsStat("/dev_flash/vsh/module/vsh.self.cexsp", &stat) == 0) 
-			vsh_type = 0xDE; 
-		else if(cellFsStat("/dev_flash/vsh/module/vsh.self.dexsp", &stat) == 0) 
-			vsh_type = 0xCE;;
-	}
+	if(cellFsStat("/dev_flash/vsh/module/vsh.self.cexsp", &stat) == 0) 
+		vsh_type = 0xDE; 
+	else if(cellFsStat("/dev_flash/vsh/module/vsh.self.dexsp", &stat) == 0) 
+		vsh_type = 0xCE;;
 	
 	#ifdef DEBUG	
 	if(vsh_type != 0x666)
