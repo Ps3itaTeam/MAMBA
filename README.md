@@ -8,17 +8,7 @@ Version of mamba who include ps3m_api_core by NzV and ps2, psp iso support by Ps
 ADD MAMBA TO YOUR BACKUP MANAGER
 ----------------------------------------------------------------------
 
-To avoid that the Backup Manager freezes, add this before loading the payload mamba:
-
-u64 vsh_type = 0x666ULL;
-sysFSStat st;
-
-if(sysLv2FsStat("/dev_flash/vsh/module/vsh.self.cexsp", &st) == 0) 
-vsh_type = 0xDEULL; 
-else if(sysLv2FsStat("/dev_flash/vsh/module/vsh.self.dexsp", &st) == 0) 
-vsh_type = 0xCEULL;
-
-lv1poke(0ULL, vsh_type); 
+To avoid that the Backup Manager freezes use NzV mamba loader to install mamba payload
 
 ----------------------------------------------------------------------
 ORIGINAL README
