@@ -20,7 +20,7 @@ LIBS           	=
 BUILD_TYPE     	= release
 EMU_SUPPORT		= none
 
-CFLAGS = -ffunction-sections -fdata-sections -O2 -m64 -fno-builtin -fno-exceptions \
+CFLAGS = -ffunction-sections -fdata-sections -Os -m64 -fno-builtin -fno-exceptions \
 			   -Wall -Wno-strict-aliasing -Wno-multichar $(foreach dir,$(INCLUDE),-I$(dir)) \
 			   -DLV2 -DFIRMWARE_$(MAMBA_VER) -DPS3M_API  -DKW_STEALTH_EXT -DIS_MAMBA -ffreestanding
 CFLAGS += --std=gnu99

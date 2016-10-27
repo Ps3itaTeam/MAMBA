@@ -116,6 +116,9 @@ fi
 if [ -f mamba_4_80.lz.bin ]; then  
 mv mamba_4_80.lz.bin  mamba/mamba_480C.lz.bin
 fi
+if [ -f mamba_4_80DEX.lz.bin ]; then  
+mv mamba_4_80DEX.lz.bin  mamba/mamba_480D.lz.bin
+fi
 
 if [ ! -d mamba/bin ]; then
 mkdir mamba/bin
